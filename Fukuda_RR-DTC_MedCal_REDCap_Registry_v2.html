@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f6f7f9" />
+<title>Fukuda Clinical Indication Score | RR-DTC Lenvatinib MedCal</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --text:#15171a; --muted:#69717c;
+  --line:#e6e8ec; --accent:#1769e0; --accent-soft:#eaf2ff;
+  --green:#178a52; --green-soft:#e9f7ef; --amber:#a86800; --amber-soft:#fff4df;
+  --red:#c83a3a; --red-soft:#fff0f0; --shadow:0 18px 55px rgba(22,30,45,.08);
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0; color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,
+  "Noto Sans TC","PingFang TC","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:760px;margin:0 auto;min-height:100vh;padding:20px 18px calc(36px + env(safe-area-inset-bottom))}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:2px 0 18px}
+.brand{display:flex;align-items:center;gap:11px}
+.mark{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#0b66e4,#4d8ef0);color:white;
+  box-shadow:0 7px 20px rgba(23,105,224,.25);font-weight:800;letter-spacing:-.5px;
+}
+.brand-title{font-size:16px;font-weight:760;letter-spacing:-.2px}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.pill{font-size:11px;font-weight:700;padding:6px 9px;border-radius:999px;background:#eef0f3;color:#5b6470;white-space:nowrap}
+
+.hero{
+  background:var(--card);border:1px solid rgba(0,0,0,.03);border-radius:24px;
+  padding:25px 22px 21px;box-shadow:var(--shadow);margin-bottom:14px;
+}
+.eyebrow{font-size:12px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
+.hero p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}
+.scope{
+  display:flex;gap:8px;align-items:flex-start;margin-top:16px;padding:12px 13px;border-radius:14px;
+  background:#f8f9fb;font-size:12.5px;line-height:1.45;color:#4f5965
+}
+.scope b{color:#333942}
+.dot-i{
+  flex:0 0 20px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  background:#e9edf3;font-weight:800;font-size:12px;color:#536171
+}
+
+.progress-card{
+  background:var(--card);border-radius:18px;padding:14px 16px;margin:14px 0;
+  border:1px solid var(--line)
+}
+.progress-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:9px}
+.progress-row strong{color:#404853}
+.track{height:7px;background:#eef0f3;border-radius:99px;overflow:hidden}
+.bar{height:100%;width:12.5%;background:var(--accent);border-radius:99px;transition:width .28s ease}
+
+.question{
+  display:none;background:var(--card);border-radius:24px;padding:24px 21px 21px;
+  border:1px solid rgba(0,0,0,.04);box-shadow:var(--shadow);
+  animation:fade .22s ease;
+}
+.question.active{display:block}
+@keyframes fade{from{opacity:.25;transform:translateY(4px)}to{opacity:1;transform:none}}
+.qnum{font-size:12px;color:var(--accent);font-weight:750;letter-spacing:.04em}
+.qtitle{font-size:24px;line-height:1.18;letter-spacing:-.6px;font-weight:760;margin:8px 0 7px}
+.qhelp{font-size:13px;line-height:1.48;color:var(--muted);margin:0 0 19px}
+.choice-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.choice{
+  width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);
+  border-radius:16px;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;
+  transition:.15s ease;color:var(--text)
+}
+.choice:hover{border-color:#c9d7ec}
+.choice.selected{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent) inset}
+.choice-title{font-size:15px;font-weight:700}
+.choice-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.score-chip{
+  min-width:36px;height:28px;padding:0 9px;border-radius:999px;display:grid;place-items:center;
+  background:#f0f2f5;color:#646c76;font-size:12px;font-weight:800
+}
+.choice.selected .score-chip{background:#fff;color:var(--accent)}
+.number-wrap{display:flex;align-items:stretch;gap:10px}
+.number-wrap input{
+  width:100%;border:1.5px solid var(--line);border-radius:16px;padding:16px;
+  outline:none;background:#fff;font-size:22px;font-weight:700;color:var(--text)
+}
+.number-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,105,224,.10)}
+.unit{
+  min-width:83px;border:1.5px solid var(--line);border-radius:16px;display:grid;place-items:center;
+  padding:0 10px;color:#56606c;font-size:13px;font-weight:700;background:#fafbfc
+}
+.threshold{font-size:12px;color:var(--muted);margin-top:10px}
+.threshold strong{color:#444b55}
+
+.nav{display:flex;gap:10px;margin-top:20px}
+.btn{
+  border:0;border-radius:14px;padding:14px 17px;font-weight:750;min-height:48px;
+}
+.btn.secondary{background:#eef0f3;color:#4d5661}
+.btn.primary{background:var(--accent);color:white;flex:1;box-shadow:0 8px 20px rgba(23,105,224,.18)}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+.result{
+  display:none;background:var(--card);border-radius:24px;padding:22px;
+  border:1px solid rgba(0,0,0,.04);box-shadow:var(--shadow)
+}
+.result.show{display:block;animation:fade .22s ease}
+.result-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.total-label{font-size:12px;font-weight:760;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.total{font-size:58px;line-height:1;font-weight:820;letter-spacing:-2.5px;margin:5px 0}
+.total span{font-size:18px;color:#8b929c;font-weight:700;letter-spacing:-.2px}
+.risk-badge{border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;margin-top:3px}
+.risk-low{background:var(--green-soft);color:var(--green)}
+.risk-mid{background:var(--amber-soft);color:var(--amber)}
+.risk-high{background:var(--red-soft);color:var(--red)}
+.interpret{border-radius:17px;padding:15px 16px;margin:15px 0 17px;line-height:1.5}
+.interpret.low{background:var(--green-soft);color:#236b47}
+.interpret.mid{background:var(--amber-soft);color:#805b17}
+.interpret.high{background:var(--red-soft);color:#8c3636}
+.interpret-title{font-size:15px;font-weight:800;margin-bottom:3px}
+.interpret-text{font-size:13px}
+.section-title{font-size:13px;font-weight:800;margin:20px 0 10px;color:#414851}
+.breakdown{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line);font-size:12.5px}
+.row:last-child{border-bottom:0}
+.row .left{min-width:0}
+.row .name{font-weight:700;color:#3f4650}
+.row .value{color:var(--muted);margin-top:2px;white-space:normal}
+.pt{font-size:12px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:5px 8px;white-space:nowrap}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}
+.actions button{border:0;border-radius:14px;padding:13px;font-weight:750}
+.copy{background:var(--accent);color:#fff}
+.reset{background:#eef0f3;color:#4e5660}
+
+.evidence{
+  margin-top:15px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;
+}
+.evidence h2{font-size:15px;margin:0 0 9px}
+.evidence p,.evidence li{font-size:12px;line-height:1.55;color:var(--muted)}
+.evidence ul{padding-left:18px;margin:8px 0}
+.ref{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:11.5px;color:#737b85;line-height:1.5}
+.footer{text-align:center;font-size:10.5px;color:#949aa2;padding:16px 6px 0}
+.toast{
+  position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);
+  background:#1f2329;color:white;padding:10px 14px;border-radius:999px;font-size:12px;
+  opacity:0;pointer-events:none;transition:.22s ease;box-shadow:0 10px 30px rgba(0,0,0,.18)
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.small-link{border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:720;padding:7px 0}
+
+@media (min-width:620px){
+  .app{padding-top:34px}
+  .hero{padding:30px 28px 25px}
+  .question,.result{padding:28px}
+  .choice-grid.two{grid-template-columns:1fr 1fr}
+}
+@media print{
+  body{background:white}
+  .topbar,.hero,.progress-card,.question,.actions,.footer,.toast{display:none!important}
+  .result{display:block!important;box-shadow:none;border:0;padding:0}
+  .evidence{border:0;padding:0;margin-top:20px}
+}
+
+.record-card{
+  background:var(--card);border-radius:20px;padding:18px;margin:14px 0;
+  border:1px solid var(--line);box-shadow:0 8px 30px rgba(22,30,45,.04)
+}
+.record-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.record-title{font-size:15px;font-weight:800}
+.record-count{font-size:11px;font-weight:800;padding:6px 9px;border-radius:999px;background:#eef0f3;color:#606975}
+.field-label{display:block;font-size:12px;font-weight:800;color:#4a535e;margin:0 0 7px}
+.field-input{
+  width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;
+  outline:none;background:#fff;font-size:16px;font-weight:650;color:var(--text)
+}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,105,224,.10)}
+.field-note{font-size:11.5px;line-height:1.45;color:var(--muted);margin-top:7px}
+.privacy-note{
+  display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:11px 12px;border-radius:13px;
+  background:#f8f9fb;color:#69717c;font-size:11px;line-height:1.45
+}
+.registry-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.registry-actions button{border:0;border-radius:12px;padding:11px 10px;font-size:12px;font-weight:800}
+.view-data{background:#eef0f3;color:#4d5661}
+.export-data{background:#eaf2ff;color:var(--accent)}
+.save-result{
+  width:100%;margin-top:11px;border:0;border-radius:14px;padding:14px 16px;
+  background:var(--green);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(23,138,82,.16)
+}
+.save-result:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}
+.saved-banner{
+  display:none;margin-top:11px;border-radius:13px;padding:11px 12px;background:var(--green-soft);
+  color:#236b47;font-size:12px;font-weight:700
+}
+.saved-banner.show{display:block}
+.modal{
+  position:fixed;inset:0;z-index:1000;background:rgba(14,18,24,.42);display:none;
+  align-items:flex-end;justify-content:center;padding:18px
+}
+.modal.show{display:flex}
+.modal-card{
+  width:min(980px,100%);max-height:85vh;background:#fff;border-radius:24px 24px 18px 18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.25);overflow:hidden;display:flex;flex-direction:column
+}
+.modal-top{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}
+.modal-top h3{font-size:17px;margin:0}
+.modal-close{border:0;background:#eef0f3;color:#4d5661;border-radius:999px;width:34px;height:34px;font-weight:900}
+.modal-tools{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+.modal-tools button{border:0;border-radius:11px;padding:9px 11px;font-size:12px;font-weight:800}
+.table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+.data-table{border-collapse:collapse;width:100%;min-width:1150px;font-size:11.5px}
+.data-table th,.data-table td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;white-space:nowrap}
+.data-table th{position:sticky;top:0;background:#f8f9fb;z-index:1;color:#515a65;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+.data-table td{color:#454d57}
+.delete-row{border:0;background:var(--red-soft);color:var(--red);border-radius:9px;padding:6px 8px;font-size:10.5px;font-weight:800}
+.empty-state{padding:38px 20px;text-align:center;color:var(--muted);font-size:13px}
+.danger{background:var(--red-soft)!important;color:var(--red)!important}
+@media (max-width:520px){
+  .registry-actions{grid-template-columns:1fr}
+}
+@media print{
+  .record-card,.modal,.save-result,.saved-banner{display:none!important}
+}
+
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">F</div>
+      <div>
+        <div class="brand-title">Fukuda Score</div>
+        <div class="brand-sub">RR-DTC · Lenvatinib registry & decision support</div>
+      </div>
+    </div>
+    <div class="pill">MedCal Registry</div>
+  </div>
+
+  <section class="hero" id="hero">
+    <div class="eyebrow">Clinical Indication Score</div>
+    <h1>When to consider<br>lenvatinib in RR-DTC</h1>
+    <p>依 Fukuda et al. 2022 原始 8 項臨床指標，快速分為 low、intermediate 與 high-risk。</p>
+    <div class="scope">
+      <div class="dot-i">i</div>
+      <div><b>適用範圍：</b>radioiodine-refractory differentiated thyroid cancer (RR-DTC)。此工具協助治療時機判斷，不是一般甲狀腺癌預後分期，也不取代完整適應症、禁忌症與病人偏好評估。</div>
+    </div>
+  </section>
+
+
+  <section class="record-card" id="recordCard">
+    <div class="record-head">
+      <div class="record-title">Patient record</div>
+      <div class="record-count" id="recordCount">0 saved records</div>
+    </div>
+    <label class="field-label" for="mrnInput">Medical Record Number (MRN) *</label>
+    <input class="field-input" id="mrnInput" type="text" inputmode="text" maxlength="40"
+           placeholder="Enter medical record number" autocomplete="off" aria-label="Medical record number">
+    <div class="field-note">MRN is required before a result can be saved to the registry.</div>
+    <div class="privacy-note">
+      <div class="dot-i">i</div>
+      <div>Registry data are stored only in this browser on this device using local storage. They are not transmitted to a server by this standalone file. For clinical deployment, use an institution-approved secure environment.</div>
+    </div>
+    <div class="registry-actions">
+      <button type="button" class="view-data" id="viewDataBtn">View registry</button>
+      <button type="button" class="export-data" id="exportXlsxBtn">Export Excel (.xlsx)</button>
+    </div>
+  </section>
+
+  <section class="progress-card" id="progressCard">
+    <div class="progress-row"><strong id="progressText">Question 1 / 8</strong><span id="answeredText">0 answered</span></div>
+    <div class="track"><div class="bar" id="bar"></div></div>
+  </section>
+
+  <form id="calcForm" autocomplete="off">
+    <section class="question active" data-step="0" data-key="age">
+      <div class="qnum">QUESTION 1 / 8</div>
+      <div class="qtitle">How old is the patient?</div>
+      <p class="qhelp">Age at the decision point for lenvatinib initiation.</p>
+      <div class="number-wrap">
+        <input id="ageInput" type="number" min="18" max="120" step="1" inputmode="numeric" placeholder="e.g. 68" aria-label="Age in years">
+        <div class="unit">years</div>
+      </div>
+      <div class="threshold"><strong>Fukuda threshold:</strong> ≤65 = 0 point · &gt;65 = 1 point</div>
+      <div class="nav"><button type="button" class="btn primary" id="ageNext" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="1" data-key="symptoms">
+      <div class="qnum">QUESTION 2 / 8</div>
+      <div class="qtitle">Tumor-related symptoms?</div>
+      <p class="qhelp">例如 hemoptysis / bloody sputum、cough、pain、dyspnea 等腫瘤相關症狀。</p>
+      <div class="choice-grid two">
+        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Asymptomatic</div><div class="choice-sub">No tumor-related symptom</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Symptomatic</div><div class="choice-sub">Tumor-related symptom present</div></div><div class="score-chip">+1</div></button>
+      </div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="2" data-key="histology">
+      <div class="qnum">QUESTION 3 / 8</div>
+      <div class="qtitle">Histological subtype?</div>
+      <p class="qhelp">依原始 Fukuda clinical indication score 分類。</p>
+      <div class="choice-grid">
+        <button type="button" class="choice" data-value="0" data-label="Papillary thyroid cancer"><div><div class="choice-title">Papillary thyroid cancer (PTC)</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1" data-label="Follicular thyroid cancer"><div><div class="choice-title">Follicular thyroid cancer (FTC)</div></div><div class="score-chip">+1</div></button>
+        <button type="button" class="choice" data-value="1" data-label="Poorly differentiated thyroid cancer"><div><div class="choice-title">Poorly differentiated thyroid cancer (PDTC)</div></div><div class="score-chip">+1</div></button>
+      </div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="3" data-key="metastasis">
+      <div class="qnum">QUESTION 4 / 8</div>
+      <div class="qtitle">Metastatic sites?</div>
+      <p class="qhelp">這一項不是「轉移部位數 ≥3」；原始 score 使用 pulmonary-only versus extrapulmonary disease。</p>
+      <div class="choice-grid two">
+        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Pulmonary only</div><div class="choice-sub">Metastases confined to lung</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Extrapulmonary disease</div><div class="choice-sub">Any metastatic disease outside lung</div></div><div class="score-chip">+1</div></button>
+      </div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="4" data-key="nlr">
+      <div class="qnum">QUESTION 5 / 8</div>
+      <div class="qtitle">Neutrophil-to-lymphocyte ratio</div>
+      <p class="qhelp">NLR = absolute neutrophil count ÷ absolute lymphocyte count.</p>
+      <div class="number-wrap">
+        <input id="nlrInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 2.63" aria-label="Neutrophil to lymphocyte ratio">
+        <div class="unit">NLR</div>
+      </div>
+      <div class="threshold"><strong>Fukuda threshold:</strong> ≤3 = 0 point · &gt;3 = 1 point</div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="nlrNext" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="5" data-key="lungSize">
+      <div class="qnum">QUESTION 6 / 8</div>
+      <div class="qtitle">Size of lung metastasis</div>
+      <p class="qhelp">輸入可測量肺轉移病灶大小；若沒有肺轉移，選擇 No lung metastasis。</p>
+      <div class="choice-grid" style="margin-bottom:10px">
+        <button type="button" class="choice no-lung" data-value="0"><div><div class="choice-title">No lung metastasis</div><div class="choice-sub">No pulmonary metastatic lesion</div></div><div class="score-chip">0</div></button>
+      </div>
+      <div class="number-wrap">
+        <input id="lungInput" type="number" min="0" max="500" step="0.1" inputmode="decimal" placeholder="e.g. 12.0" aria-label="Size of lung metastasis in millimeters">
+        <div class="unit">mm</div>
+      </div>
+      <div class="threshold"><strong>Fukuda threshold:</strong> &lt;10 mm = 0 point · ≥10 mm = 1 point</div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="lungNext" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="6" data-key="baselineSize">
+      <div class="qnum">QUESTION 7 / 8</div>
+      <div class="qtitle">Baseline tumor size</div>
+      <p class="qhelp">原文 scoring table 的 baseline tumor size cut-off 為 40 mm。</p>
+      <div class="number-wrap">
+        <input id="baselineInput" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder="e.g. 41.1" aria-label="Baseline tumor size in millimeters">
+        <div class="unit">mm</div>
+      </div>
+      <div class="threshold"><strong>Fukuda threshold:</strong> ≤40 mm = 0 point · &gt;40 mm = 1 point</div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="baselineNext" disabled>Next →</button></div>
+    </section>
+
+    <section class="question" data-step="7" data-key="tvdt">
+      <div class="qnum">QUESTION 8 / 8</div>
+      <div class="qtitle">Tumor-volume doubling time</div>
+      <p class="qhelp">輸入 TV-DT（years）。原始 scoring table 以 1 year 為 cut-off。</p>
+      <div class="number-wrap">
+        <input id="tvdtInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 0.53" aria-label="Tumor volume doubling time in years">
+        <div class="unit">years</div>
+      </div>
+      <div class="threshold"><strong>Fukuda threshold:</strong> &gt;1 year = 0 point · ≤1 year = 1 point</div>
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="calcBtn" disabled>Calculate score</button></div>
+    </section>
+  </form>
+
+  <section class="result" id="result" aria-live="polite">
+    <div class="result-head">
+      <div>
+        <div class="total-label">Fukuda clinical indication score</div>
+        <div class="total"><span id="totalScore">0</span><span> / 8</span></div>
+      </div>
+      <div class="risk-badge" id="riskBadge">Low-risk</div>
+    </div>
+    <div class="interpret" id="interpretBox">
+      <div class="interpret-title" id="interpretTitle"></div>
+      <div class="interpret-text" id="interpretText"></div>
+    </div>
+
+    <div class="section-title">Score breakdown</div>
+    <div class="breakdown" id="breakdown"></div>
+
+
+    <button type="button" class="save-result" id="saveRecordBtn" disabled>Save result to registry</button>
+    <div class="saved-banner" id="savedBanner">Saved to local registry.</div>
+
+    <div class="actions">
+      <button type="button" class="reset" id="resetBtn">Start over</button>
+      <button type="button" class="copy" id="copyBtn">Copy result</button>
+    </div>
+    <button type="button" class="small-link" onclick="window.print()">Print / Save as PDF</button>
+  </section>
+
+  <section class="evidence">
+    <h2>How to use this result</h2>
+    <ul>
+      <li><b>Low-risk (0–2):</b> original proposed algorithm supports a watch-and-wait approach / continued active surveillance when clinically appropriate.</li>
+      <li><b>Intermediate-risk (3–5):</b> Fukuda et al. identified this group as the proposed optimal window for considering lenvatinib initiation.</li>
+      <li><b>High-risk (6–8):</b> original algorithm supports considering lenvatinib; this group also had the poorest prognosis after treatment initiation in the derivation cohort.</li>
+    </ul>
+    <div class="ref">
+      Source: Fukuda N, Toda K, Udagawa S, et al. <i>A proposed clinical scoring system for initiation of lenvatinib treatment in radioiodine-refractory thyroid cancer patients.</i> Endocrine. 2022;76(1):70–77. doi:10.1007/s12020-021-02963-z.<br><br>
+      Derivation: single-center retrospective cohort, n=59. This is a proposed clinical decision-support score and should not be used as a stand-alone treatment mandate.
+    </div>
+  </section>
+
+  <div class="footer">For clinician decision support · Local registry mode · Not a substitute for multidisciplinary assessment</div>
+</main>
+
+<div class="modal" id="registryModal" role="dialog" aria-modal="true" aria-labelledby="registryTitle">
+  <div class="modal-card">
+    <div class="modal-top">
+      <div>
+        <h3 id="registryTitle">Fukuda Registry</h3>
+        <div class="brand-sub" id="modalCount">0 records</div>
+      </div>
+      <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">×</button>
+    </div>
+    <div class="modal-tools">
+      <button type="button" class="export-data" id="modalExportBtn">Export Excel (.xlsx)</button>
+      <button type="button" class="view-data" id="modalNewBtn">New assessment</button>
+      <button type="button" class="danger" id="clearAllBtn">Delete all local records</button>
+    </div>
+    <div class="table-wrap" id="registryTableWrap"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Result copied</div>
+
+<script>
+const state = {
+  mrn:'',
+  age:null, symptoms:null, histology:null, histologyLabel:null, metastasis:null,
+  nlr:null, lungSize:null, lungNo:false, baselineSize:null, tvdt:null
+};
+const STORAGE_KEY = 'fukuda_rrdtc_registry_v1';
+let lastCalculated = null;
+
+function loadRecords(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const x = raw ? JSON.parse(raw) : [];
+    return Array.isArray(x) ? x : [];
+  }catch(e){ return []; }
+}
+function storeRecords(records){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  updateRecordCount();
+}
+function updateRecordCount(){
+  const n = loadRecords().length;
+  const label = `${n} saved record${n===1?'':'s'}`;
+  const el = document.getElementById('recordCount');
+  if(el) el.textContent = label;
+  const m = document.getElementById('modalCount');
+  if(m) m.textContent = `${n} record${n===1?'':'s'}`;
+}
+function makeAssessmentId(){
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  const ms = String(d.getMilliseconds()).padStart(3,'0');
+  return `FUK-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}${ms}`;
+}
+function isoLocal(d=new Date()){
+  const p=n=>String(n).padStart(2,'0');
+  const tz=-d.getTimezoneOffset(), s=tz>=0?'+':'-', ah=Math.floor(Math.abs(tz)/60), am=Math.abs(tz)%60;
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}${s}${p(ah)}:${p(am)}`;
+}
+let step = 0;
+const qs = [...document.querySelectorAll('.question')];
+const bar = document.getElementById('bar');
+const progressText = document.getElementById('progressText');
+const answeredText = document.getElementById('answeredText');
+
+const mrnInput = document.getElementById('mrnInput');
+mrnInput.addEventListener('input', ()=>{
+  state.mrn = mrnInput.value.trim();
+  const btn = document.getElementById('saveRecordBtn');
+  if(btn) btn.disabled = !state.mrn || !lastCalculated;
+  document.getElementById('savedBanner').classList.remove('show');
+});
+
+
+function answeredCount(){
+  let n=0;
+  if(state.age!==null)n++;
+  if(state.symptoms!==null)n++;
+  if(state.histology!==null)n++;
+  if(state.metastasis!==null)n++;
+  if(state.nlr!==null)n++;
+  if(state.lungSize!==null || state.lungNo)n++;
+  if(state.baselineSize!==null)n++;
+  if(state.tvdt!==null)n++;
+  return n;
+}
+function updateProgress(){
+  progressText.textContent = `Question ${step+1} / 8`;
+  answeredText.textContent = `${answeredCount()} answered`;
+  bar.style.width = `${((step+1)/8)*100}%`;
+}
+function showStep(n){
+  step=Math.max(0,Math.min(7,n));
+  qs.forEach((q,i)=>q.classList.toggle('active',i===step));
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('calcForm').style.display='';
+  document.getElementById('progressCard').style.display='';
+  updateProgress();
+  window.scrollTo({top:Math.max(0,qs[step].offsetTop-120),behavior:'smooth'});
+}
+function choose(section,key,value,label){
+  section.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
+  const btn=event.currentTarget;
+  btn.classList.add('selected');
+  state[key]=Number(value);
+  if(key==='histology') state.histologyLabel=label || btn.dataset.label || btn.querySelector('.choice-title').textContent;
+  section.querySelector('.next').disabled=false;
+  updateProgress();
+}
+document.querySelectorAll('.question').forEach(section=>{
+  const key=section.dataset.key;
+  section.querySelectorAll('.choice:not(.no-lung)').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      section.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
+      this.classList.add('selected');
+      state[key]=Number(this.dataset.value);
+      if(key==='histology') state.histologyLabel=this.dataset.label || this.querySelector('.choice-title').textContent;
+      const next=section.querySelector('.next');
+      if(next) next.disabled=false;
+      updateProgress();
+    });
+  });
+});
+document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>showStep(step+1)));
+document.querySelectorAll('.back').forEach(b=>b.addEventListener('click',()=>showStep(step-1)));
+
+const ageInput=document.getElementById('ageInput');
+ageInput.addEventListener('input',()=>{
+  const v=parseFloat(ageInput.value);
+  state.age=Number.isFinite(v)?v:null;
+  document.getElementById('ageNext').disabled=state.age===null || v<18 || v>120;
+  updateProgress();
+});
+document.getElementById('ageNext').addEventListener('click',()=>showStep(1));
+
+const nlrInput=document.getElementById('nlrInput');
+nlrInput.addEventListener('input',()=>{
+  const v=parseFloat(nlrInput.value);
+  state.nlr=Number.isFinite(v)?v:null;
+  document.getElementById('nlrNext').disabled=state.nlr===null || v<0;
+  updateProgress();
+});
+document.getElementById('nlrNext').addEventListener('click',()=>showStep(5));
+
+const lungInput=document.getElementById('lungInput');
+const noLung=document.querySelector('.no-lung');
+function syncLung(){
+  const valid=state.lungNo || state.lungSize!==null;
+  document.getElementById('lungNext').disabled=!valid;
+  updateProgress();
+}
+noLung.addEventListener('click',()=>{
+  state.lungNo=!state.lungNo;
+  if(state.lungNo){
+    noLung.classList.add('selected');
+    state.lungSize=null; lungInput.value=''; lungInput.disabled=true;
+  } else {
+    noLung.classList.remove('selected'); lungInput.disabled=false;
+  }
+  syncLung();
+});
+lungInput.addEventListener('input',()=>{
+  const v=parseFloat(lungInput.value);
+  state.lungSize=Number.isFinite(v)?v:null;
+  if(state.lungSize!==null){state.lungNo=false;noLung.classList.remove('selected')}
+  syncLung();
+});
+document.getElementById('lungNext').addEventListener('click',()=>showStep(6));
+
+const baselineInput=document.getElementById('baselineInput');
+baselineInput.addEventListener('input',()=>{
+  const v=parseFloat(baselineInput.value);
+  state.baselineSize=Number.isFinite(v)?v:null;
+  document.getElementById('baselineNext').disabled=state.baselineSize===null || v<0;
+  updateProgress();
+});
+document.getElementById('baselineNext').addEventListener('click',()=>showStep(7));
+
+const tvdtInput=document.getElementById('tvdtInput');
+tvdtInput.addEventListener('input',()=>{
+  const v=parseFloat(tvdtInput.value);
+  state.tvdt=Number.isFinite(v)?v:null;
+  document.getElementById('calcBtn').disabled=state.tvdt===null || v<0;
+  updateProgress();
+});
+
+function scoreData(){
+  const lungDisplay = state.lungNo ? 'No lung metastasis' : `${state.lungSize} mm`;
+  const items=[
+    ['Age', `${state.age} years`, state.age>65?1:0],
+    ['Tumor-related symptoms', state.symptoms===1?'Symptomatic':'Asymptomatic', state.symptoms],
+    ['Histology', state.histologyLabel, state.histology],
+    ['Metastatic sites', state.metastasis===1?'Extrapulmonary disease':'Pulmonary only', state.metastasis],
+    ['NLR', String(state.nlr), state.nlr>3?1:0],
+    ['Lung metastasis size', lungDisplay, state.lungNo?0:(state.lungSize>=10?1:0)],
+    ['Baseline tumor size', `${state.baselineSize} mm`, state.baselineSize>40?1:0],
+    ['TV-DT', `${state.tvdt} years`, state.tvdt<=1?1:0]
+  ];
+  return items;
+}
+function calculate(){
+  if(answeredCount()<8) return;
+  const items=scoreData();
+  const total=items.reduce((a,x)=>a+x[2],0);
+  let risk, cls, title, text;
+  if(total<=2){
+    risk='Low-risk';cls='low';
+    title='Watch-and-wait approach';
+    text='Score 0–2. The original Fukuda algorithm supports continued active surveillance when otherwise clinically appropriate.';
+  } else if(total<=5){
+    risk='Intermediate-risk';cls='mid';
+    title='Consider lenvatinib — proposed optimal window';
+    text='Score 3–5. In the derivation cohort, this was the group the authors regarded as the optimal timing window for starting lenvatinib.';
+  } else {
+    risk='High-risk';cls='high';
+    title='Consider starting lenvatinib';
+    text='Score 6–8. The original algorithm supports treatment consideration; this category also represented a poorer-prognosis group in the derivation cohort.';
+  }
+  document.getElementById('totalScore').textContent=total;
+  const badge=document.getElementById('riskBadge');
+  badge.textContent=risk; badge.className=`risk-badge risk-${cls}`;
+  const box=document.getElementById('interpretBox');
+  box.className=`interpret ${cls}`;
+  document.getElementById('interpretTitle').textContent=title;
+  document.getElementById('interpretText').textContent=text;
+  document.getElementById('breakdown').innerHTML=items.map(x=>`
+    <div class="row">
+      <div class="left"><div class="name">${x[0]}</div><div class="value">${x[1]}</div></div>
+      <div class="pt">${x[2] ? '+1' : '0'} pt</div>
+    </div>`).join('');
+  lastCalculated = {items,total,risk};
+  const saveBtn = document.getElementById('saveRecordBtn');
+  saveBtn.disabled = !state.mrn;
+  document.getElementById('savedBanner').classList.remove('show');
+  document.getElementById('calcForm').style.display='none';
+  document.getElementById('progressCard').style.display='none';
+  document.getElementById('result').classList.add('show');
+  window.scrollTo({top:document.getElementById('result').offsetTop-20,behavior:'smooth'});
+}
+document.getElementById('calcBtn').addEventListener('click',calculate);
+
+function resetAll(){
+  Object.assign(state,{mrn:'',age:null,symptoms:null,histology:null,histologyLabel:null,metastasis:null,nlr:null,lungSize:null,lungNo:false,baselineSize:null,tvdt:null});
+  lastCalculated = null;
+  document.querySelectorAll('input').forEach(i=>{i.value='';i.disabled=false});
+  document.getElementById('savedBanner').classList.remove('show');
+  document.getElementById('saveRecordBtn').disabled=true;
+  document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
+  document.querySelectorAll('.next').forEach(x=>x.disabled=true);
+  ['ageNext','nlrNext','lungNext','baselineNext','calcBtn'].forEach(id=>document.getElementById(id).disabled=true);
+  showStep(0);
+}
+document.getElementById('resetBtn').addEventListener('click',resetAll);
+
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  const items=scoreData();
+  const total=items.reduce((a,x)=>a+x[2],0);
+  const risk=total<=2?'Low-risk':total<=5?'Intermediate-risk':'High-risk';
+  const lines=[
+    `Fukuda Clinical Indication Score: ${total}/8 (${risk})`,
+    ...items.map(x=>`${x[0]}: ${x[1]} — ${x[2]} point${x[2]===1?'':'s'}`),
+    '',
+    'For RR-DTC lenvatinib initiation decision support.',
+    'Fukuda N et al. Endocrine. 2022;76(1):70–77.'
+  ];
+  try{
+    await navigator.clipboard.writeText(lines.join('\n'));
+    const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500);
+  }catch(e){
+    alert(lines.join('\n'));
+  }
+});
+
+function scoreValueByName(items,name){
+  const x = items.find(i=>i[0]===name);
+  return x ? x[2] : '';
+}
+function buildRecord(){
+  if(!lastCalculated || !state.mrn) return null;
+  const now = new Date();
+  const items = lastCalculated.items;
+  return {
+    record_id: makeAssessmentId(),
+    mrn: state.mrn,
+    assessment_timestamp: isoLocal(now),
+    age_years: state.age,
+    tumor_related_symptoms: state.symptoms===1 ? 'Symptomatic' : 'Asymptomatic',
+    symptoms_score: state.symptoms,
+    histology: state.histologyLabel,
+    histology_score: state.histology,
+    metastatic_sites: state.metastasis===1 ? 'Extrapulmonary disease' : 'Pulmonary only',
+    metastatic_sites_score: state.metastasis,
+    nlr: state.nlr,
+    nlr_score: state.nlr>3 ? 1 : 0,
+    lung_metastasis_mm: state.lungNo ? '' : state.lungSize,
+    no_lung_metastasis: state.lungNo ? 1 : 0,
+    lung_size_score: state.lungNo ? 0 : (state.lungSize>=10 ? 1 : 0),
+    baseline_tumor_size_mm: state.baselineSize,
+    baseline_size_score: state.baselineSize>40 ? 1 : 0,
+    tvdt_years: state.tvdt,
+    tvdt_score: state.tvdt<=1 ? 1 : 0,
+    age_score: state.age>65 ? 1 : 0,
+    fukuda_total_score: lastCalculated.total,
+    risk_group: lastCalculated.risk
+  };
+}
+document.getElementById('saveRecordBtn').addEventListener('click', ()=>{
+  const rec = buildRecord();
+  if(!rec){
+    if(!state.mrn) mrnInput.focus();
+    return;
+  }
+  const records = loadRecords();
+  records.push(rec);
+  storeRecords(records);
+  document.getElementById('savedBanner').textContent = `Saved: ${rec.record_id}`;
+  document.getElementById('savedBanner').classList.add('show');
+  document.getElementById('saveRecordBtn').disabled = true;
+});
+
+const columnDefs = [
+  ['record_id','Assessment ID'],
+  ['mrn','MRN'],
+  ['assessment_timestamp','Assessment timestamp'],
+  ['age_years','Age (years)'],
+  ['age_score','Age score'],
+  ['tumor_related_symptoms','Tumor-related symptoms'],
+  ['symptoms_score','Symptoms score'],
+  ['histology','Histology'],
+  ['histology_score','Histology score'],
+  ['metastatic_sites','Metastatic sites'],
+  ['metastatic_sites_score','Metastatic sites score'],
+  ['nlr','NLR'],
+  ['nlr_score','NLR score'],
+  ['lung_metastasis_mm','Lung metastasis size (mm)'],
+  ['no_lung_metastasis','No lung metastasis'],
+  ['lung_size_score','Lung size score'],
+  ['baseline_tumor_size_mm','Baseline tumor size (mm)'],
+  ['baseline_size_score','Baseline size score'],
+  ['tvdt_years','TV-DT (years)'],
+  ['tvdt_score','TV-DT score'],
+  ['fukuda_total_score','Fukuda total score'],
+  ['risk_group','Risk group']
+];
+const dataDictionary = [
+  ['record_id','text','Unique assessment ID generated locally'],
+  ['mrn','text','Medical record number'],
+  ['assessment_timestamp','datetime','Local assessment timestamp'],
+  ['age_years','number','Age in years'],
+  ['age_score','integer','1 if age >65 years; otherwise 0'],
+  ['tumor_related_symptoms','categorical','Asymptomatic / Symptomatic'],
+  ['symptoms_score','integer','1 if symptomatic; otherwise 0'],
+  ['histology','categorical','PTC / FTC / PDTC'],
+  ['histology_score','integer','1 for FTC or PDTC; 0 for PTC'],
+  ['metastatic_sites','categorical','Pulmonary only / Extrapulmonary disease'],
+  ['metastatic_sites_score','integer','1 for extrapulmonary disease; otherwise 0'],
+  ['nlr','number','Neutrophil-to-lymphocyte ratio'],
+  ['nlr_score','integer','1 if NLR >3; otherwise 0'],
+  ['lung_metastasis_mm','number','Lung metastasis size in mm; blank if none'],
+  ['no_lung_metastasis','integer','1 if no lung metastasis; otherwise 0'],
+  ['lung_size_score','integer','1 if lung metastasis >=10 mm; otherwise 0'],
+  ['baseline_tumor_size_mm','number','Baseline tumor size in mm'],
+  ['baseline_size_score','integer','1 if baseline tumor size >40 mm; otherwise 0'],
+  ['tvdt_years','number','Tumor-volume doubling time in years'],
+  ['tvdt_score','integer','1 if TV-DT <=1 year; otherwise 0'],
+  ['fukuda_total_score','integer','Total Fukuda score, 0–8'],
+  ['risk_group','categorical','Low-risk / Intermediate-risk / High-risk']
+];
+
+function escHtml(x){
+  return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function renderRegistry(){
+  const records = loadRecords();
+  updateRecordCount();
+  const wrap = document.getElementById('registryTableWrap');
+  if(!records.length){
+    wrap.innerHTML = '<div class="empty-state">No saved records on this device yet.</div>';
+    return;
+  }
+  let s='<table class="data-table"><thead><tr>';
+  s += columnDefs.map(c=>`<th>${escHtml(c[1])}</th>`).join('');
+  s += '<th>Action</th></tr></thead><tbody>';
+  records.forEach((r,idx)=>{
+    s+='<tr>'+columnDefs.map(c=>`<td>${escHtml(r[c[0]])}</td>`).join('');
+    s+=`<td><button type="button" class="delete-row" data-index="${idx}">Delete</button></td></tr>`;
+  });
+  s+='</tbody></table>';
+  wrap.innerHTML=s;
+  wrap.querySelectorAll('.delete-row').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const rs=loadRecords(); rs.splice(Number(btn.dataset.index),1); storeRecords(rs); renderRegistry();
+    });
+  });
+}
+function openRegistry(){ renderRegistry(); document.getElementById('registryModal').classList.add('show'); }
+function closeRegistry(){ document.getElementById('registryModal').classList.remove('show'); }
+document.getElementById('viewDataBtn').addEventListener('click',openRegistry);
+document.getElementById('modalCloseBtn').addEventListener('click',closeRegistry);
+document.getElementById('registryModal').addEventListener('click',e=>{if(e.target.id==='registryModal')closeRegistry()});
+document.getElementById('modalNewBtn').addEventListener('click',()=>{closeRegistry();resetAll();window.scrollTo({top:document.getElementById('recordCard').offsetTop-15,behavior:'smooth'})});
+document.getElementById('clearAllBtn').addEventListener('click',()=>{
+  if(confirm('Delete all locally stored Fukuda registry records on this device? This cannot be undone.')){
+    localStorage.removeItem(STORAGE_KEY); renderRegistry(); updateRecordCount();
+  }
+});
+
+/* Minimal XLSX writer: creates a valid uncompressed OOXML .xlsx file without external libraries. */
+function xmlEsc(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+}
+function colName(n){
+  let s=''; while(n){ n--; s=String.fromCharCode(65+(n%26))+s; n=Math.floor(n/26); } return s;
+}
+function cellXml(v, ref){
+  if(v===null || v===undefined || v==='') return `<c r="${ref}" t="inlineStr"><is><t></t></is></c>`;
+  if(typeof v==='number' && Number.isFinite(v)) return `<c r="${ref}"><v>${v}</v></c>`;
+  return `<c r="${ref}" t="inlineStr"><is><t>${xmlEsc(v)}</t></is></c>`;
+}
+function sheetXml(rows){
+  const body = rows.map((row,ri)=>{
+    const cells=row.map((v,ci)=>cellXml(v,`${colName(ci+1)}${ri+1}`)).join('');
+    return `<row r="${ri+1}">${cells}</row>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${body}</sheetData></worksheet>`;
+}
+function crc32(bytes){
+  let table=crc32.table;
+  if(!table){
+    table=crc32.table=new Uint32Array(256);
+    for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xEDB88320^(c>>>1):c>>>1;table[n]=c>>>0;}
+  }
+  let c=0xFFFFFFFF;
+  for(const b of bytes)c=table[(c^b)&0xFF]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0;
+}
+function u16(n){return new Uint8Array([n&255,(n>>>8)&255])}
+function u32(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}
+function cat(...arrs){
+  const len=arrs.reduce((a,x)=>a+x.length,0), out=new Uint8Array(len); let p=0;
+  arrs.forEach(x=>{out.set(x,p);p+=x.length}); return out;
+}
+function zipStore(files){
+  const enc=new TextEncoder(), locals=[], centrals=[]; let offset=0;
+  files.forEach(f=>{
+    const name=enc.encode(f.name), data=typeof f.data==='string'?enc.encode(f.data):f.data;
+    const crc=crc32(data);
+    const local=cat(u32(0x04034b50),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),name,data);
+    locals.push(local);
+    const central=cat(u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name);
+    centrals.push(central); offset+=local.length;
+  });
+  const centralData=cat(...centrals);
+  const end=cat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(centralData.length),u32(offset),u16(0));
+  return cat(...locals,centralData,end);
+}
+function buildXlsx(records){
+  const recordRows=[columnDefs.map(c=>c[1]), ...records.map(r=>columnDefs.map(c=>r[c[0]]??''))];
+  const dictRows=[['Variable','Type','Definition'],...dataDictionary];
+  const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Default Extension="xml" ContentType="application/xml"/>
+    <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+    <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+    <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  </Types>`;
+  const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  </Relationships>`;
+  const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+    <sheets><sheet name="Records" sheetId="1" r:id="rId1"/><sheet name="Data Dictionary" sheetId="2" r:id="rId2"/></sheets>
+  </workbook>`;
+  const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+    <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+  </Relationships>`;
+  return zipStore([
+    {name:'[Content_Types].xml',data:contentTypes},
+    {name:'_rels/.rels',data:rootRels},
+    {name:'xl/workbook.xml',data:workbook},
+    {name:'xl/_rels/workbook.xml.rels',data:wbRels},
+    {name:'xl/worksheets/sheet1.xml',data:sheetXml(recordRows)},
+    {name:'xl/worksheets/sheet2.xml',data:sheetXml(dictRows)}
+  ]);
+}
+function exportXlsx(){
+  const records=loadRecords();
+  if(!records.length){ alert('No saved registry records to export.'); return; }
+  const bytes=buildXlsx(records);
+  const blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  a.href=url;a.download=`Fukuda_RR-DTC_Registry_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.xlsx`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+document.getElementById('exportXlsxBtn').addEventListener('click',exportXlsx);
+document.getElementById('modalExportBtn').addEventListener('click',exportXlsx);
+
+updateRecordCount();
+
+updateProgress();
+</script>
+</body>
+</html>
