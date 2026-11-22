@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#f6f7f9" />
-<title>Fukuda Clinical Indication Score | RR-DTC Lenvatinib MedCal</title>
+<title>Fukuda Clinical Indication Score | RR-DTC Targeted Therapy Timing</title>
 <style>
 :root{
   --bg:#f5f6f8; --card:#ffffff; --text:#15171a; --muted:#69717c;
@@ -16,8 +16,7 @@
 html{background:var(--bg)}
 body{
   margin:0; color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,
-  "Noto Sans TC","PingFang TC","Helvetica Neue",Arial,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Microsoft JhengHei","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 button,input{font:inherit}
@@ -26,10 +25,14 @@ button{cursor:pointer}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:2px 0 18px}
 .brand{display:flex;align-items:center;gap:11px}
 .mark{
-  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-  background:linear-gradient(145deg,#0b66e4,#4d8ef0);color:white;
-  box-shadow:0 7px 20px rgba(23,105,224,.25);font-weight:800;letter-spacing:-.5px;
+  width:42px;height:42px;border-radius:13px;position:relative;
+  background:linear-gradient(145deg,#0b66e4,#4d8ef0);
+  box-shadow:0 7px 20px rgba(23,105,224,.25);
 }
+.butterfly-mark .wing{position:absolute;top:10px;width:13px;height:20px;background:#fff;border-radius:70% 45% 65% 35%}
+.butterfly-mark .wing-l{left:7px;transform:rotate(-20deg);transform-origin:right center}
+.butterfly-mark .wing-r{right:7px;transform:scaleX(-1) rotate(-20deg);transform-origin:left center}
+.butterfly-mark .body-dot{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:4px;height:22px;border-radius:99px;background:rgba(255,255,255,.96)}
 .brand-title{font-size:16px;font-weight:760;letter-spacing:-.2px}
 .brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .pill{font-size:11px;font-weight:700;padding:6px 9px;border-radius:999px;background:#eef0f3;color:#5b6470;white-space:nowrap}
@@ -133,18 +136,24 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 .row .name{font-weight:700;color:#3f4650}
 .row .value{color:var(--muted);margin-top:2px;white-space:normal}
 .pt{font-size:12px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:5px 8px;white-space:nowrap}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:17px}
 .actions button{border:0;border-radius:14px;padding:13px;font-weight:750}
-.copy{background:var(--accent);color:#fff}
+.copy{background:#eef0f3;color:#4e5660}
+.pdf-export{background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(23,105,224,.18)}
 .reset{background:#eef0f3;color:#4e5660}
+.pdf-report-meta{display:none}
+.pdf-report-title{font-size:22px;font-weight:820;letter-spacing:-.5px;margin:0 0 5px}
+.pdf-report-subtitle{font-size:11px;color:#747b84;margin-bottom:14px}
+.pdf-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px;font-size:11px;color:#555d67;border-top:1px solid #e8eaee;border-bottom:1px solid #e8eaee;padding:9px 0;margin-bottom:18px}
+.pdf-meta-grid b{color:#343a42}
 
 .evidence{
-  margin-top:15px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;
+  margin-top:15px;background:#fafbfc;border:1px solid #eef0f3;border-radius:20px;padding:18px;
 }
 .evidence h2{font-size:15px;margin:0 0 9px}
 .evidence p,.evidence li{font-size:12px;line-height:1.55;color:var(--muted)}
 .evidence ul{padding-left:18px;margin:8px 0}
-.ref{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;font-size:11.5px;color:#737b85;line-height:1.5}
+.ref{border-top:1px solid #eef0f3;margin-top:14px;padding-top:10px;font-size:9.5px;color:#a1a7af;line-height:1.45;font-weight:400}
 .footer{text-align:center;font-size:10.5px;color:#949aa2;padding:16px 6px 0}
 .toast{
   position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);
@@ -161,10 +170,24 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
   .choice-grid.two{grid-template-columns:1fr 1fr}
 }
 @media print{
-  body{background:white}
-  .topbar,.hero,.progress-card,.question,.actions,.footer,.toast{display:none!important}
-  .result{display:block!important;box-shadow:none;border:0;padding:0}
-  .evidence{border:0;padding:0;margin-top:20px}
+  @page{size:A4;margin:14mm 15mm 15mm}
+  html,body{background:#fff!important}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .app{max-width:none;padding:0}
+  .topbar,.hero,.progress-card,.question,.actions,.footer,.toast,.record-card,.modal,.save-result,.saved-banner,.small-link{display:none!important}
+  .result{display:block!important;box-shadow:none;border:0;padding:0;margin:0}
+  .pdf-report-meta{display:block!important}
+  .result-head{margin-top:0}
+  .total{font-size:48px}
+  .breakdown{break-inside:avoid}
+  .row{padding:8px 10px;font-size:10.5px}
+  .section-title{font-size:11px;margin:15px 0 8px}
+  .interpret{padding:12px 13px;margin:12px 0 14px;break-inside:avoid}
+  .interpret-title{font-size:13px}.interpret-text{font-size:10.5px}
+  .evidence{border:0;background:#fff;padding:0;margin-top:18px;break-inside:avoid}
+  .evidence h2{font-size:11px;margin-bottom:6px}
+  .evidence li{font-size:9.5px;line-height:1.45}
+  .ref{font-size:8px!important;color:#a9afb7!important;border-top:1px solid #eff1f3!important;margin-top:9px!important;padding-top:7px!important}
 }
 
 .record-card{
@@ -223,9 +246,346 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 .danger{background:var(--red-soft)!important;color:var(--red)!important}
 @media (max-width:520px){
   .registry-actions{grid-template-columns:1fr}
+  .actions{grid-template-columns:1fr 1fr}
+  .pdf-export{grid-column:1 / -1}
 }
 @media print{
   .record-card,.modal,.save-result,.saved-banner{display:none!important}
+}
+
+
+.registry-actions-3{grid-template-columns:1fr 1fr}
+.sheets-data{background:#e9f7ef!important;color:#178a52!important}
+.sheets-copy{background:#f0f7f2!important;color:#1f7a50!important}
+.google-help{margin-top:10px;font-size:10.5px;line-height:1.45;color:#8a919a}
+@media (max-width:520px){.registry-actions-3{grid-template-columns:1fr}}
+
+
+.signature{
+  text-align:center;
+  margin-top:6px;
+  font-size:10.5px;
+  color:#a0a6ae;
+  letter-spacing:.02em;
+}
+.signature strong{
+  color:#7f8791;
+  font-weight:700;
+}
+@media print{
+  .signature{
+    display:block!important;
+    margin-top:18px;
+    font-size:9pt;
+    color:#9aa0a8;
+  }
+}
+
+
+.tvdt-tools{
+  margin-top:16px;border:1px solid var(--line);border-radius:18px;background:#fafbfc;overflow:hidden
+}
+.tvdt-tools summary{
+  list-style:none;cursor:pointer;padding:14px 15px;font-size:13px;font-weight:800;color:#3f4853;
+  display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.tvdt-tools summary::-webkit-details-marker{display:none}
+.tvdt-tools summary::after{content:"＋";font-size:18px;color:var(--accent);font-weight:600}
+.tvdt-tools[open] summary::after{content:"−"}
+.tvdt-tools-body{border-top:1px solid var(--line);padding:15px}
+.tvdt-mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.tvdt-mode button{
+  min-height:42px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:#55606c;
+  font-size:12px;font-weight:800
+}
+.tvdt-mode button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.tvdt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tvdt-field label{display:block;font-size:11px;font-weight:800;color:#59636e;margin:0 0 6px}
+.tvdt-field input{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:11px 12px;
+  font-size:14px;color:var(--text);outline:none;min-height:44px
+}
+.tvdt-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,105,224,.10)}
+.tvdt-measure-label{font-size:11.5px;color:var(--muted);margin:12px 0 8px}
+.tvdt-calc-btn{
+  width:100%;margin-top:12px;border:0;border-radius:12px;min-height:44px;background:#eef4fd;
+  color:var(--accent);font-size:12.5px;font-weight:800
+}
+.tvdt-output{
+  display:none;margin-top:12px;border-radius:14px;padding:12px 13px;background:#fff;border:1px solid var(--line)
+}
+.tvdt-output.show{display:block}
+.tvdt-output-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tvdt-metric{background:#f7f9fb;border-radius:10px;padding:9px 10px}
+.tvdt-metric span{display:block;font-size:10px;color:var(--muted);margin-bottom:2px}
+.tvdt-metric strong{font-size:15px;color:#343c46}
+.tvdt-status{font-size:11.5px;line-height:1.45;margin-top:9px;color:#58616c}
+.tvdt-status.good{color:#226844}
+.tvdt-status.alert{color:#a05d00}
+.tvdt-status.error{color:#a33b3b}
+.tvdt-apply{
+  display:none;width:100%;margin-top:10px;border:0;border-radius:12px;min-height:42px;
+  background:var(--accent);color:#fff;font-size:12.5px;font-weight:800
+}
+.tvdt-apply.show{display:block}
+.tvdt-formula{
+  margin-top:10px;font-size:9.5px;line-height:1.45;color:#9aa1aa
+}
+@media (max-width:520px){
+  .tvdt-grid,.tvdt-output-grid{grid-template-columns:1fr}
+}
+@media print{
+  .tvdt-tools{display:none!important}
+}
+
+
+.record-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.record-grid{grid-template-columns:1fr}}
+
+.nlr-tools{
+  margin-top:16px;border:1px solid var(--line);border-radius:18px;background:#fafbfc;overflow:hidden
+}
+.nlr-tools summary{
+  list-style:none;cursor:pointer;padding:14px 15px;font-size:13px;font-weight:800;color:#3f4853;
+  display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.nlr-tools summary::-webkit-details-marker{display:none}
+.nlr-tools summary::after{content:"＋";font-size:18px;color:var(--accent);font-weight:600}
+.nlr-tools[open] summary::after{content:"−"}
+.nlr-tools-body{border-top:1px solid var(--line);padding:15px}
+.nlr-mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.nlr-mode button{
+  min-height:42px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:#55606c;
+  font-size:12px;font-weight:800
+}
+.nlr-mode button.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.nlr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nlr-grid.three{grid-template-columns:1fr 1fr 1fr}
+.nlr-field label{display:block;font-size:11px;font-weight:800;color:#59636e;margin:0 0 6px}
+.nlr-field input{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:11px 12px;
+  font-size:14px;color:var(--text);outline:none;min-height:44px
+}
+.nlr-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(23,105,224,.10)}
+.nlr-help{font-size:11.5px;color:var(--muted);line-height:1.45;margin:10px 0}
+.nlr-calc-btn{
+  width:100%;margin-top:12px;border:0;border-radius:12px;min-height:44px;background:#eef4fd;
+  color:var(--accent);font-size:12.5px;font-weight:800
+}
+.nlr-output{
+  display:none;margin-top:12px;border-radius:14px;padding:12px 13px;background:#fff;border:1px solid var(--line)
+}
+.nlr-output.show{display:block}
+.nlr-output-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nlr-metric{background:#f7f9fb;border-radius:10px;padding:9px 10px}
+.nlr-metric span{display:block;font-size:10px;color:var(--muted);margin-bottom:2px}
+.nlr-metric strong{font-size:15px;color:#343c46}
+.nlr-status{font-size:11.5px;line-height:1.45;margin-top:9px;color:#58616c}
+.nlr-status.good{color:#226844}
+.nlr-status.alert{color:#a05d00}
+.nlr-status.error{color:#a33b3b}
+.nlr-apply{
+  display:none;width:100%;margin-top:10px;border:0;border-radius:12px;min-height:42px;
+  background:var(--accent);color:#fff;font-size:12.5px;font-weight:800
+}
+.nlr-apply.show{display:block}
+.nlr-formula{margin-top:10px;font-size:9.5px;line-height:1.45;color:#9aa1aa}
+@media (max-width:520px){
+  .nlr-grid,.nlr-grid.three,.nlr-output-grid{grid-template-columns:1fr}
+}
+@media print{
+  .nlr-tools{display:none!important}
+}
+
+
+/* ===== PC landscape dashboard ===== */
+@media (min-width:1100px){
+  body{background:#f3f6f8;overflow-x:hidden}
+  .app{max-width:1900px;margin:0 auto;padding:14px 18px 24px}
+  .topbar{margin-bottom:10px;padding:4px 2px}
+  .brand-title{font-size:22px}
+  .brand-sub{font-size:11px}
+  .topbar .pill{display:none}
+  .hero{display:none!important}
+
+  .pc-score-chip{
+    margin-left:auto;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);
+    border-radius:16px;padding:8px 12px;box-shadow:0 4px 18px rgba(31,48,64,.06)
+  }
+  .pc-score-chip .pc-score-kicker{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pc-score-chip .pc-score-main{font-size:24px;line-height:1;font-weight:900;color:var(--accent)}
+  .pc-score-chip .pc-score-risk{font-size:10px;font-weight:800;color:var(--muted);min-width:80px;text-align:right}
+
+  .record-card{
+    margin:0 0 12px;padding:12px 14px;border-radius:16px;
+    display:grid;grid-template-columns:minmax(390px,.85fr) minmax(600px,1.5fr);column-gap:14px;row-gap:6px;align-items:end
+  }
+  .record-head{grid-column:1 / -1;margin:0}
+  .record-title{font-size:13px}
+  .record-grid{grid-column:1;grid-row:2;grid-template-columns:1fr 1fr;gap:8px}
+  .record-card .field-label{font-size:10px;margin-bottom:4px}
+  .record-card .field-input{min-height:38px;padding:8px 10px;border-radius:10px;font-size:12px}
+  .record-card .field-note{grid-column:1;grid-row:3;font-size:9px;margin:0}
+  .record-card .privacy-note{display:none}
+  .record-card .registry-actions{grid-column:2;grid-row:2;grid-template-columns:repeat(4,1fr);gap:7px;margin:0}
+  .record-card .registry-actions button{min-height:38px;padding:7px 8px;font-size:10px;border-radius:10px}
+  .record-card .google-help{grid-column:2;grid-row:3;font-size:8.5px;margin:0;line-height:1.3}
+
+  .progress-card{display:none!important}
+
+  #calcForm{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+    align-items:stretch;
+  }
+  #calcForm .question{
+    display:block!important;opacity:1!important;transform:none!important;
+    margin:0;padding:13px 14px;border-radius:16px;box-shadow:0 4px 18px rgba(31,48,64,.045);
+    min-width:0;min-height:0;
+  }
+  #calcForm .qnum{font-size:9px;margin-bottom:4px}
+  #calcForm .qtitle{font-size:15.5px;line-height:1.18;margin-bottom:4px}
+  #calcForm .qhelp{font-size:10px;line-height:1.3;margin:0 0 8px}
+  #calcForm .choice-grid{gap:6px}
+  #calcForm .choice{min-height:39px;padding:8px 9px;border-radius:11px;gap:6px}
+  #calcForm .choice-title{font-size:10.8px;line-height:1.15}
+  #calcForm .choice-sub{font-size:8.8px;line-height:1.2;margin-top:2px}
+  #calcForm .score-chip{font-size:9px;min-width:27px;padding:4px 5px}
+  #calcForm .number-wrap{margin:7px 0 0}
+  #calcForm .number-wrap input{min-height:39px;padding:8px 10px;font-size:13px}
+  #calcForm .unit{font-size:9px}
+  #calcForm .threshold{font-size:9.2px;line-height:1.3;margin-top:7px;padding:7px 8px;border-radius:9px}
+  #calcForm .nav{display:none!important}
+  #calcForm .question[data-step='7'] .nav{display:block!important;margin-top:9px}
+  #calcForm .question[data-step='7'] .nav .back{display:none!important}
+  #calcForm #calcBtn{width:100%;min-height:38px;padding:8px 12px;font-size:11px}
+
+  #calcForm .nlr-tools,#calcForm .tvdt-tools{margin-top:8px;border-radius:11px}
+  #calcForm .nlr-tools summary,#calcForm .tvdt-tools summary{padding:8px 9px;font-size:9.8px}
+  #calcForm .nlr-tools-body,#calcForm .tvdt-tools-body{padding:9px}
+  #calcForm .nlr-grid,#calcForm .tvdt-grid{gap:6px}
+  #calcForm .nlr-field label,#calcForm .tvdt-field label{font-size:8.8px;margin-bottom:3px}
+  #calcForm .nlr-field input,#calcForm .tvdt-field input{min-height:35px;padding:7px 8px;font-size:11px;border-radius:9px}
+  #calcForm .nlr-mode button,#calcForm .tvdt-mode button{min-height:35px;font-size:9px;border-radius:9px}
+  #calcForm .nlr-help,#calcForm .tvdt-measure-label{font-size:8.8px;line-height:1.3}
+  #calcForm .nlr-calc-btn,#calcForm .tvdt-calc-btn{min-height:35px;font-size:9.5px;margin-top:8px}
+  #calcForm .nlr-formula,#calcForm .tvdt-formula{font-size:8px}
+
+  /* Results become a desktop side drawer after calculation */
+  .result.show{
+    position:fixed;z-index:1000;top:76px;right:18px;width:370px;max-height:calc(100vh - 96px);
+    overflow:auto;margin:0;padding:18px;border-radius:18px;box-shadow:0 18px 55px rgba(22,42,58,.20);
+    background:#fff;border:1px solid var(--line)
+  }
+  .result.show .pdf-report-meta{display:none}
+  .result.show .total{font-size:38px}
+  .result.show .breakdown .row{padding:8px 0}
+  .result.show .breakdown .name{font-size:10px}
+  .result.show .breakdown .value{font-size:9px}
+  .result.show .actions{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .result.show .actions button{font-size:9px;padding:8px 5px}
+  .result.show .save-result{min-height:38px;font-size:10px}
+
+  .evidence{margin-top:12px;padding:12px 14px;border-radius:14px}
+  .evidence h2{font-size:13px;margin-bottom:4px}
+  .evidence ul{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:5px 0 7px;padding-left:18px}
+  .evidence li{font-size:9px;line-height:1.3}
+  .evidence .ref{font-size:7.5px;line-height:1.3}
+  .footer{font-size:8px}
+}
+
+@media (min-width:1350px) and (max-width:1599px){
+  #calcForm{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .record-card{grid-template-columns:minmax(360px,.9fr) minmax(520px,1.3fr)}
+  .record-card .registry-actions{grid-template-columns:repeat(2,1fr)}
+}
+
+@media (min-width:1100px) and (max-width:1349px){
+  #calcForm{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .record-card{grid-template-columns:1fr}
+  .record-head,.record-grid,.record-card .field-note,.record-card .registry-actions,.record-card .google-help{grid-column:1;grid-row:auto}
+  .record-card .registry-actions{grid-template-columns:repeat(4,1fr)}
+}
+
+
+/* ===== Multilingual selector ===== */
+.topbar-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.lang-switch{
+  display:flex;align-items:center;gap:7px;padding:5px 7px 5px 9px;
+  border:1px solid var(--line);border-radius:12px;background:#fff;
+  box-shadow:0 4px 14px rgba(22,30,45,.04)
+}
+.lang-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.03em}
+.lang-switch select{
+  appearance:auto;border:0;outline:none;background:#f6f8fa;color:#37414c;
+  border-radius:8px;padding:6px 8px;font-size:11px;font-weight:750;cursor:pointer
+}
+@media(max-width:700px){
+  .topbar{align-items:flex-start}
+  .topbar-tools{gap:6px}
+  .lang-label{display:none}
+  .lang-switch{padding:4px}
+  .lang-switch select{font-size:10.5px;padding:5px 6px}
+}
+
+
+/* ===== v16: robust language dock + compact introduction ===== */
+.lang-switch{
+  position:fixed !important;
+  top:14px !important;
+  right:18px !important;
+  z-index:6000 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation;
+  min-width:178px;
+}
+.lang-switch, .lang-switch *{pointer-events:auto !important}
+.lang-switch select{
+  position:relative;
+  z-index:6001;
+  min-width:112px;
+  cursor:pointer !important;
+}
+.topbar-tools{padding-right:195px}
+
+.clinical-intro{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  margin:0 0 12px;padding:10px 13px;border:1px solid var(--line);border-radius:14px;
+  background:#fff;box-shadow:0 3px 14px rgba(31,48,64,.035)
+}
+.clinical-intro-main{display:flex;gap:9px;align-items:flex-start;min-width:0}
+.clinical-intro-icon{
+  flex:0 0 22px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:900
+}
+.clinical-intro-text{font-size:11px;line-height:1.45;color:#56616d}
+.clinical-intro-text strong{color:#303842}
+.about-score{
+  flex:0 0 auto;position:relative
+}
+.about-score summary{
+  cursor:pointer;list-style:none;white-space:nowrap;border:1px solid var(--line);
+  border-radius:10px;background:#f7f9fb;padding:7px 9px;font-size:10px;font-weight:800;color:#4f5965
+}
+.about-score summary::-webkit-details-marker{display:none}
+.about-score[open] .about-panel{display:block}
+.about-panel{
+  display:none;position:absolute;right:0;top:38px;width:min(430px,75vw);z-index:3000;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 13px;
+  box-shadow:0 14px 40px rgba(22,30,45,.16);font-size:10.5px;line-height:1.5;color:#56616d
+}
+.about-panel b{color:#303842}
+.about-panel .about-note{margin-top:8px;color:#7a838d;font-size:9.5px}
+
+@media(max-width:1099px){
+  .lang-switch{top:10px !important;right:10px !important;min-width:150px}
+  .topbar-tools{padding-right:160px}
+  .clinical-intro{display:none}
+}
+@media(max-width:520px){
+  .lang-switch{min-width:0}
+  .lang-switch select{min-width:96px}
 }
 
 </style>
@@ -234,43 +594,87 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 <main class="app">
   <div class="topbar">
     <div class="brand">
-      <div class="mark">F</div>
+      <div class="mark butterfly-mark" aria-label="Thyroid butterfly icon">
+      <span class="wing wing-l"></span><span class="wing wing-r"></span><span class="body-dot"></span>
+    </div>
       <div>
-        <div class="brand-title">Fukuda Score</div>
-        <div class="brand-sub">RR-DTC · Lenvatinib registry & decision support</div>
+        <div class="brand-title">Fukuda Clinical Indication Score</div>
+        <div class="brand-sub">RR-DTC · Targeted therapy timing & case registry</div>
       </div>
     </div>
-    <div class="pill">MedCal Registry</div>
+    <div class="topbar-tools">
+      <div class="pill">Clinical Calculator</div>
+      <div class="lang-switch" aria-label="Language selector">
+        <span class="lang-label">Language</span>
+        <select id="languageSelect" aria-label="Language" onchange="if(window.fukudaSetLanguage){window.fukudaSetLanguage(this.value)}">
+          <option value="en">English</option>
+          <option value="zh-Hant">繁體中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+    </div>
   </div>
+
+  <section class="clinical-intro" id="clinicalIntro">
+    <div class="clinical-intro-main">
+      <div class="clinical-intro-icon">i</div>
+      <div class="clinical-intro-text">
+        <strong>Purpose:</strong> A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.
+      </div>
+    </div>
+    <details class="about-score">
+      <summary>About this score</summary>
+      <div class="about-panel">
+        <b>How to use:</b> Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.
+        <div class="about-note">Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.</div>
+      </div>
+    </details>
+  </section>
 
   <section class="hero" id="hero">
     <div class="eyebrow">Clinical Indication Score</div>
-    <h1>When to consider<br>lenvatinib in RR-DTC</h1>
-    <p>依 Fukuda et al. 2022 原始 8 項臨床指標，快速分為 low、intermediate 與 high-risk。</p>
+    <h1>When to consider<br>targeted therapy</h1>
+    <p>Uses the 8-item Fukuda clinical score to support timing of targeted therapy initiation in patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC).</p>
     <div class="scope">
       <div class="dot-i">i</div>
-      <div><b>適用範圍：</b>radioiodine-refractory differentiated thyroid cancer (RR-DTC)。此工具協助治療時機判斷，不是一般甲狀腺癌預後分期，也不取代完整適應症、禁忌症與病人偏好評估。</div>
+      <div><b>Intended population:</b> patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC). This tool supports treatment-timing assessment and does not replace full clinical evaluation of indications, contraindications, or patient preferences.</div>
     </div>
   </section>
 
 
   <section class="record-card" id="recordCard">
     <div class="record-head">
-      <div class="record-title">Patient record</div>
+      <div class="record-title">Patient Record</div>
       <div class="record-count" id="recordCount">0 saved records</div>
     </div>
-    <label class="field-label" for="mrnInput">Medical Record Number (MRN) *</label>
-    <input class="field-input" id="mrnInput" type="text" inputmode="text" maxlength="40"
-           placeholder="Enter medical record number" autocomplete="off" aria-label="Medical record number">
-    <div class="field-note">MRN is required before a result can be saved to the registry.</div>
+    <div class="record-grid">
+      <div>
+        <label class="field-label" for="mrnInput">Medical Record Number (MRN) *</label>
+        <input class="field-input" id="mrnInput" type="text" inputmode="text" maxlength="40"
+               placeholder="Enter medical record number" autocomplete="off" aria-label="Medical record number">
+      </div>
+      <div>
+        <label class="field-label" for="pretreatmentDateInput">Pretreatment Date *</label>
+        <input class="field-input" id="pretreatmentDateInput" type="date"
+               autocomplete="off" aria-label="Pretreatment date">
+      </div>
+    </div>
+    <div class="field-note">MRN and Pretreatment Date are required before saving a result to the registry.</div>
     <div class="privacy-note">
       <div class="dot-i">i</div>
-      <div>Registry data are stored only in this browser on this device using local storage. They are not transmitted to a server by this standalone file. For clinical deployment, use an institution-approved secure environment.</div>
+      <div>Registry data are stored only in this browser on this device and are not automatically uploaded to a server. For clinical or research deployment, use an institution-approved secure environment.</div>
     </div>
-    <div class="registry-actions">
-      <button type="button" class="view-data" id="viewDataBtn">View registry</button>
+    <div class="registry-actions registry-actions-3">
+      <button type="button" class="view-data" id="viewDataBtn">View Registry</button>
       <button type="button" class="export-data" id="exportXlsxBtn">Export Excel (.xlsx)</button>
+      <button type="button" class="sheets-data" id="exportSheetsBtn">Export Google Sheets (CSV)</button>
+      <button type="button" class="sheets-copy" id="copySheetsBtn">Copy for Google Sheets</button>
     </div>
+    <div class="google-help">Google Sheets: export a UTF-8 CSV for import, or copy the entire dataset and paste it directly into Google Sheets. MRNs are sensitive data; use only institution-approved accounts and storage.</div>
   </section>
 
   <section class="progress-card" id="progressCard">
@@ -282,7 +686,7 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
     <section class="question active" data-step="0" data-key="age">
       <div class="qnum">QUESTION 1 / 8</div>
       <div class="qtitle">How old is the patient?</div>
-      <p class="qhelp">Age at the decision point for lenvatinib initiation.</p>
+      <p class="qhelp">Use the patient’s age at the current treatment-timing assessment.</p>
       <div class="number-wrap">
         <input id="ageInput" type="number" min="18" max="120" step="1" inputmode="numeric" placeholder="e.g. 68" aria-label="Age in years">
         <div class="unit">years</div>
@@ -294,10 +698,10 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
     <section class="question" data-step="1" data-key="symptoms">
       <div class="qnum">QUESTION 2 / 8</div>
       <div class="qtitle">Tumor-related symptoms?</div>
-      <p class="qhelp">例如 hemoptysis / bloody sputum、cough、pain、dyspnea 等腫瘤相關症狀。</p>
+      <p class="qhelp">Examples include hemoptysis/bloody sputum, cough, pain, or dyspnea related to tumor burden.</p>
       <div class="choice-grid two">
-        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Asymptomatic</div><div class="choice-sub">No tumor-related symptom</div></div><div class="score-chip">0</div></button>
-        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Symptomatic</div><div class="choice-sub">Tumor-related symptom present</div></div><div class="score-chip">+1</div></button>
+        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Asymptomatic</div><div class="choice-sub">No tumor-related symptoms</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Symptomatic</div><div class="choice-sub">Tumor-related symptoms present</div></div><div class="score-chip">+1</div></button>
       </div>
       <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
     </section>
@@ -305,11 +709,11 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
     <section class="question" data-step="2" data-key="histology">
       <div class="qnum">QUESTION 3 / 8</div>
       <div class="qtitle">Histological subtype?</div>
-      <p class="qhelp">依原始 Fukuda clinical indication score 分類。</p>
+      <p class="qhelp">Classified according to the original Fukuda clinical indication score.</p>
       <div class="choice-grid">
-        <button type="button" class="choice" data-value="0" data-label="Papillary thyroid cancer"><div><div class="choice-title">Papillary thyroid cancer (PTC)</div></div><div class="score-chip">0</div></button>
-        <button type="button" class="choice" data-value="1" data-label="Follicular thyroid cancer"><div><div class="choice-title">Follicular thyroid cancer (FTC)</div></div><div class="score-chip">+1</div></button>
-        <button type="button" class="choice" data-value="1" data-label="Poorly differentiated thyroid cancer"><div><div class="choice-title">Poorly differentiated thyroid cancer (PDTC)</div></div><div class="score-chip">+1</div></button>
+        <button type="button" class="choice" data-value="0" data-label="Papillary thyroid cancer (PTC)"><div><div class="choice-title">Papillary thyroid cancer (PTC)</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1" data-label="Follicular thyroid cancer (FTC)"><div><div class="choice-title">Follicular thyroid cancer (FTC)</div></div><div class="score-chip">+1</div></button>
+        <button type="button" class="choice" data-value="1" data-label="Poorly differentiated thyroid cancer (PDTC)"><div><div class="choice-title">Poorly differentiated thyroid cancer (PDTC)</div></div><div class="score-chip">+1</div></button>
       </div>
       <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
     </section>
@@ -317,30 +721,94 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
     <section class="question" data-step="3" data-key="metastasis">
       <div class="qnum">QUESTION 4 / 8</div>
       <div class="qtitle">Metastatic sites?</div>
-      <p class="qhelp">這一項不是「轉移部位數 ≥3」；原始 score 使用 pulmonary-only versus extrapulmonary disease。</p>
+      <p class="qhelp">This item distinguishes pulmonary-only disease from extrapulmonary metastatic disease; it does not count the number of metastatic sites.</p>
       <div class="choice-grid two">
-        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Pulmonary only</div><div class="choice-sub">Metastases confined to lung</div></div><div class="score-chip">0</div></button>
-        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Extrapulmonary disease</div><div class="choice-sub">Any metastatic disease outside lung</div></div><div class="score-chip">+1</div></button>
+        <button type="button" class="choice" data-value="0"><div><div class="choice-title">Pulmonary only</div><div class="choice-sub">Metastases confined to the lung</div></div><div class="score-chip">0</div></button>
+        <button type="button" class="choice" data-value="1"><div><div class="choice-title">Extrapulmonary disease</div><div class="choice-sub">Any metastatic disease outside the lung</div></div><div class="score-chip">+1</div></button>
       </div>
       <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary next" disabled>Next →</button></div>
     </section>
 
     <section class="question" data-step="4" data-key="nlr">
       <div class="qnum">QUESTION 5 / 8</div>
-      <div class="qtitle">Neutrophil-to-lymphocyte ratio</div>
-      <p class="qhelp">NLR = absolute neutrophil count ÷ absolute lymphocyte count.</p>
+      <div class="qtitle">Neutrophil-to-lymphocyte ratio (NLR)</div>
+      <p class="qhelp">Enter a known pretreatment NLR directly, or calculate it from the same pretreatment CBC below.</p>
       <div class="number-wrap">
-        <input id="nlrInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 2.63" aria-label="Neutrophil to lymphocyte ratio">
+        <input id="nlrInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 3.14" aria-label="Neutrophil-to-lymphocyte ratio">
         <div class="unit">NLR</div>
       </div>
       <div class="threshold"><strong>Fukuda threshold:</strong> ≤3 = 0 point · &gt;3 = 1 point</div>
+
+      <details class="nlr-tools" id="nlrTools">
+        <summary>Calculate NLR from pretreatment CBC</summary>
+        <div class="nlr-tools-body">
+          <div class="nlr-field" style="margin-bottom:12px">
+            <label for="nlrCbcDate">CBC date</label>
+            <input id="nlrCbcDate" type="date">
+          </div>
+
+          <div class="nlr-mode" role="group" aria-label="NLR calculation method">
+            <button type="button" id="nlrModePercent" class="active">CBC differential (%)</button>
+            <button type="button" id="nlrModeAbsolute">Absolute counts</button>
+          </div>
+
+          <div id="nlrPercentPanel">
+            <div class="nlr-help">Use values from the <strong>same CBC</strong>. If Band is reported separately, it is added to Seg automatically.</div>
+            <div class="nlr-grid three">
+              <div class="nlr-field">
+                <label for="nlrSeg">Seg / neutrophils (%)</label>
+                <input id="nlrSeg" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="e.g. 72.4">
+              </div>
+              <div class="nlr-field">
+                <label for="nlrBand">Band (%) — optional</label>
+                <input id="nlrBand" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="e.g. 0">
+              </div>
+              <div class="nlr-field">
+                <label for="nlrLymPct">Lymphocytes (%)</label>
+                <input id="nlrLymPct" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="e.g. 18.5">
+              </div>
+            </div>
+          </div>
+
+          <div id="nlrAbsolutePanel" style="display:none">
+            <div class="nlr-help">Enter ANC and ALC from the <strong>same CBC</strong>. Units cancel as long as both counts use the same unit.</div>
+            <div class="nlr-grid">
+              <div class="nlr-field">
+                <label for="nlrAnc">Absolute neutrophil count (ANC)</label>
+                <input id="nlrAnc" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 5.41">
+              </div>
+              <div class="nlr-field">
+                <label for="nlrAlc">Absolute lymphocyte count (ALC)</label>
+                <input id="nlrAlc" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 1.38">
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="nlr-calc-btn" id="nlrCalcBtn">Calculate NLR</button>
+
+          <div class="nlr-output" id="nlrOutput" aria-live="polite">
+            <div class="nlr-output-grid">
+              <div class="nlr-metric"><span>Calculated NLR</span><strong id="nlrResult">—</strong></div>
+              <div class="nlr-metric"><span>Fukuda NLR item</span><strong id="nlrScoreResult">—</strong></div>
+            </div>
+            <div class="nlr-status" id="nlrStatus"></div>
+            <button type="button" class="nlr-apply" id="nlrApplyBtn">Use this NLR in Fukuda score</button>
+          </div>
+
+          <div class="nlr-formula">
+            NLR = neutrophils ÷ lymphocytes. With CBC differential percentages, NLR = (Seg + Band) ÷ Lymphocytes.
+            Use a pretreatment CBC collected as close as clinically appropriate to the treatment-timing assessment.
+          </div>
+        </div>
+      </details>
+
       <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="nlrNext" disabled>Next →</button></div>
     </section>
 
     <section class="question" data-step="5" data-key="lungSize">
       <div class="qnum">QUESTION 6 / 8</div>
-      <div class="qtitle">Size of lung metastasis</div>
-      <p class="qhelp">輸入可測量肺轉移病灶大小；若沒有肺轉移，選擇 No lung metastasis。</p>
+      <div class="qtitle">Size of lung metastasis?</div>
+      <p class="qhelp">Enter the measurable size of a pulmonary metastatic lesion; choose “No lung metastasis” if none is present.</p>
       <div class="choice-grid" style="margin-bottom:10px">
         <button type="button" class="choice no-lung" data-value="0"><div><div class="choice-title">No lung metastasis</div><div class="choice-sub">No pulmonary metastatic lesion</div></div><div class="score-chip">0</div></button>
       </div>
@@ -354,8 +822,8 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 
     <section class="question" data-step="6" data-key="baselineSize">
       <div class="qnum">QUESTION 7 / 8</div>
-      <div class="qtitle">Baseline tumor size</div>
-      <p class="qhelp">原文 scoring table 的 baseline tumor size cut-off 為 40 mm。</p>
+      <div class="qtitle">Baseline tumor size?</div>
+      <p class="qhelp">Use baseline tumor size at the current treatment-timing assessment.</p>
       <div class="number-wrap">
         <input id="baselineInput" type="number" min="0" max="1000" step="0.1" inputmode="decimal" placeholder="e.g. 41.1" aria-label="Baseline tumor size in millimeters">
         <div class="unit">mm</div>
@@ -366,58 +834,123 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 
     <section class="question" data-step="7" data-key="tvdt">
       <div class="qnum">QUESTION 8 / 8</div>
-      <div class="qtitle">Tumor-volume doubling time</div>
-      <p class="qhelp">輸入 TV-DT（years）。原始 scoring table 以 1 year 為 cut-off。</p>
+      <div class="qtitle">Tumor-volume doubling time (TV-DT)?</div>
+      <p class="qhelp">Enter a known TV-DT directly, or calculate a quick 2-study estimate below.</p>
       <div class="number-wrap">
-        <input id="tvdtInput" type="number" min="0" max="100" step="0.01" inputmode="decimal" placeholder="e.g. 0.53" aria-label="Tumor volume doubling time in years">
+        <input id="tvdtInput" type="number" min="0" max="100" step="0.001" inputmode="decimal" placeholder="e.g. 0.53" aria-label="Tumor-volume doubling time in years">
         <div class="unit">years</div>
       </div>
       <div class="threshold"><strong>Fukuda threshold:</strong> &gt;1 year = 0 point · ≤1 year = 1 point</div>
-      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="calcBtn" disabled>Calculate score</button></div>
+
+      <details class="tvdt-tools" id="tvdtTools">
+        <summary>Calculate TV-DT from two imaging studies</summary>
+        <div class="tvdt-tools-body">
+          <div class="tvdt-mode" role="group" aria-label="TV-DT measurement method">
+            <button type="button" id="tvdtModeDiameter" class="active">Diameter</button>
+            <button type="button" id="tvdtModeVolume">Volume</button>
+          </div>
+
+          <div class="tvdt-grid">
+            <div class="tvdt-field">
+              <label for="tvdtDate1">Date of 1st study</label>
+              <input id="tvdtDate1" type="date">
+            </div>
+            <div class="tvdt-field">
+              <label for="tvdtDate2">Date of 2nd study</label>
+              <input id="tvdtDate2" type="date">
+            </div>
+          </div>
+
+          <div class="tvdt-measure-label" id="tvdtMeasureHelp">
+            Enter the same lesion's maximum diameter at both studies. Diameter mode assumes a spherical tumor (volume ∝ diameter³).
+          </div>
+          <div class="tvdt-grid">
+            <div class="tvdt-field">
+              <label for="tvdtMeasure1" id="tvdtMeasure1Label">Diameter at 1st study (cm)</label>
+              <input id="tvdtMeasure1" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 1.20">
+            </div>
+            <div class="tvdt-field">
+              <label for="tvdtMeasure2" id="tvdtMeasure2Label">Diameter at 2nd study (cm)</label>
+              <input id="tvdtMeasure2" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 1.80">
+            </div>
+          </div>
+
+          <button type="button" class="tvdt-calc-btn" id="tvdtCalcBtn">Calculate TV-DT</button>
+
+          <div class="tvdt-output" id="tvdtOutput" aria-live="polite">
+            <div class="tvdt-output-grid">
+              <div class="tvdt-metric"><span>Study interval</span><strong id="tvdtIntervalResult">—</strong></div>
+              <div class="tvdt-metric"><span>TV-DT</span><strong id="tvdtDaysResult">—</strong></div>
+              <div class="tvdt-metric"><span>TV-DT (years)</span><strong id="tvdtYearsResult">—</strong></div>
+              <div class="tvdt-metric"><span>Fukuda TV-DT item</span><strong id="tvdtScoreResult">—</strong></div>
+            </div>
+            <div class="tvdt-status" id="tvdtStatus"></div>
+            <button type="button" class="tvdt-apply" id="tvdtApplyBtn">Use this TV-DT in Fukuda score</button>
+          </div>
+
+          <div class="tvdt-formula">
+            Quick 2-study estimator adapted from the Radiology Tutor tumour volume doubling-time calculator:
+            TV-DT = Δt × ln(2) / ln(V₂/V₁). In diameter mode, spherical growth is assumed, so V₂/V₁ = (d₂/d₁)³.
+            If the lesion is stable or smaller at follow-up, a positive doubling time cannot be calculated.
+          </div>
+        </div>
+      </details>
+
+      <div class="nav"><button type="button" class="btn secondary back">← Back</button><button type="button" class="btn primary" id="calcBtn" disabled>Calculate Score</button></div>
     </section>
   </form>
 
   <section class="result" id="result" aria-live="polite">
+    <div class="pdf-report-meta" id="pdfReportMeta">
+      <div class="pdf-report-title">Fukuda Clinical Indication Score Report</div>
+      <div class="pdf-report-subtitle">Radioiodine-Refractory Differentiated Thyroid Cancer (RR-DTC) · Targeted Therapy Timing Assessment</div>
+      <div class="pdf-meta-grid">
+        <div><b>Medical Record Number：</b><span id="pdfMrn">—</span></div>
+        <div><b>Assessment Date：</b><span id="pdfDate">—</span></div>
+      </div>
+    </div>
     <div class="result-head">
       <div>
-        <div class="total-label">Fukuda clinical indication score</div>
+        <div class="total-label">Fukuda Clinical Indication Score</div>
         <div class="total"><span id="totalScore">0</span><span> / 8</span></div>
       </div>
-      <div class="risk-badge" id="riskBadge">Low-risk</div>
+      <div class="risk-badge" id="riskBadge">Low risk</div>
     </div>
     <div class="interpret" id="interpretBox">
       <div class="interpret-title" id="interpretTitle"></div>
       <div class="interpret-text" id="interpretText"></div>
     </div>
 
-    <div class="section-title">Score breakdown</div>
+    <div class="section-title">Score Breakdown</div>
     <div class="breakdown" id="breakdown"></div>
 
 
-    <button type="button" class="save-result" id="saveRecordBtn" disabled>Save result to registry</button>
+    <button type="button" class="save-result" id="saveRecordBtn" disabled>Save to Registry</button>
     <div class="saved-banner" id="savedBanner">Saved to local registry.</div>
 
     <div class="actions">
-      <button type="button" class="reset" id="resetBtn">Start over</button>
-      <button type="button" class="copy" id="copyBtn">Copy result</button>
+      <button type="button" class="reset" id="resetBtn">Start Over</button>
+      <button type="button" class="copy" id="copyBtn">Copy Result</button>
+      <button type="button" class="pdf-export" id="exportPdfBtn">Export PDF Report</button>
     </div>
-    <button type="button" class="small-link" onclick="window.print()">Print / Save as PDF</button>
   </section>
 
   <section class="evidence">
-    <h2>How to use this result</h2>
+    <h2>Interpretation</h2>
     <ul>
-      <li><b>Low-risk (0–2):</b> original proposed algorithm supports a watch-and-wait approach / continued active surveillance when clinically appropriate.</li>
-      <li><b>Intermediate-risk (3–5):</b> Fukuda et al. identified this group as the proposed optimal window for considering lenvatinib initiation.</li>
-      <li><b>High-risk (6–8):</b> original algorithm supports considering lenvatinib; this group also had the poorest prognosis after treatment initiation in the derivation cohort.</li>
+      <li><b>Low risk (0–2):</b> continued active surveillance may be appropriate when clinically suitable.</li>
+      <li><b>Intermediate risk (3–5):</b> the original study proposed this range as the optimal window to consider initiating targeted therapy.</li>
+      <li><b>High risk (6–8):</b> prompt multidisciplinary assessment for targeted therapy initiation is recommended.</li>
     </ul>
     <div class="ref">
-      Source: Fukuda N, Toda K, Udagawa S, et al. <i>A proposed clinical scoring system for initiation of lenvatinib treatment in radioiodine-refractory thyroid cancer patients.</i> Endocrine. 2022;76(1):70–77. doi:10.1007/s12020-021-02963-z.<br><br>
-      Derivation: single-center retrospective cohort, n=59. This is a proposed clinical decision-support score and should not be used as a stand-alone treatment mandate.
+      Reference: Fukuda N, Toda K, Udagawa S, et al. <i>A proposed clinical scoring system for initiation of lenvatinib treatment in radioiodine-refractory thyroid cancer patients.</i> Endocrine. 2022;76(1):70–77. doi:10.1007/s12020-021-02963-z.<br>
+      Original derivation: single-center retrospective cohort (n=59). This score is intended as clinical decision support only.<br>
+      TV-DT calculator reference: Radiology Tutor, <i>Tumour volume doubling time</i>. Two-study formula: TV-DT = Δt × ln(2) / ln(V₂/V₁); diameter mode assumes spherical tumor growth.
     </div>
   </section>
 
-  <div class="footer">For clinician decision support · Local registry mode · Not a substitute for multidisciplinary assessment</div>
+  <div class="footer">For clinical care and case management · Includes NLR + 2-study TV-DT calculators · Supports PDF / Excel / Google Sheets export · Not a substitute for multidisciplinary clinical judgment</div>
+<div class="signature">Developed by <strong>Tina Kuo</strong></div>
 </main>
 
 <div class="modal" id="registryModal" role="dialog" aria-modal="true" aria-labelledby="registryTitle">
@@ -431,8 +964,10 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
     </div>
     <div class="modal-tools">
       <button type="button" class="export-data" id="modalExportBtn">Export Excel (.xlsx)</button>
-      <button type="button" class="view-data" id="modalNewBtn">New assessment</button>
-      <button type="button" class="danger" id="clearAllBtn">Delete all local records</button>
+      <button type="button" class="sheets-data" id="modalSheetsBtn">Export Google Sheets (CSV)</button>
+      <button type="button" class="sheets-copy" id="modalCopySheetsBtn">Copy for Google Sheets</button>
+      <button type="button" class="view-data" id="modalNewBtn">New Assessment</button>
+      <button type="button" class="danger" id="clearAllBtn">Delete All Local Records</button>
     </div>
     <div class="table-wrap" id="registryTableWrap"></div>
   </div>
@@ -443,8 +978,13 @@ h1{font-size:30px;line-height:1.08;letter-spacing:-1.2px;margin:8px 0 9px}
 <script>
 const state = {
   mrn:'',
+  pretreatmentDate:'',
   age:null, symptoms:null, histology:null, histologyLabel:null, metastasis:null,
-  nlr:null, lungSize:null, lungNo:false, baselineSize:null, tvdt:null
+  nlr:null, nlrSource:'manual', nlrMethod:null, nlrCbcDate:null,
+  nlrSeg:null, nlrBand:null, nlrLymPct:null, nlrAnc:null, nlrAlc:null,
+  lungSize:null, lungNo:false, baselineSize:null, tvdt:null,
+  tvdtSource:'manual', tvdtMethod:null, tvdtDate1:null, tvdtDate2:null,
+  tvdtMeasure1:null, tvdtMeasure2:null, tvdtCalcDays:null, tvdtCalcYears:null
 };
 const STORAGE_KEY = 'fukuda_rrdtc_registry_v1';
 let lastCalculated = null;
@@ -486,10 +1026,17 @@ const progressText = document.getElementById('progressText');
 const answeredText = document.getElementById('answeredText');
 
 const mrnInput = document.getElementById('mrnInput');
+const pretreatmentDateInput = document.getElementById('pretreatmentDateInput');
 mrnInput.addEventListener('input', ()=>{
   state.mrn = mrnInput.value.trim();
   const btn = document.getElementById('saveRecordBtn');
-  if(btn) btn.disabled = !state.mrn || !lastCalculated;
+  if(btn) btn.disabled = !state.mrn || !state.pretreatmentDate || !lastCalculated;
+  document.getElementById('savedBanner').classList.remove('show');
+});
+pretreatmentDateInput.addEventListener('input', ()=>{
+  state.pretreatmentDate = pretreatmentDateInput.value;
+  const btn = document.getElementById('saveRecordBtn');
+  if(btn) btn.disabled = !state.mrn || !state.pretreatmentDate || !lastCalculated;
   document.getElementById('savedBanner').classList.remove('show');
 });
 
@@ -556,9 +1103,118 @@ ageInput.addEventListener('input',()=>{
 document.getElementById('ageNext').addEventListener('click',()=>showStep(1));
 
 const nlrInput=document.getElementById('nlrInput');
+const nlrModePercent=document.getElementById('nlrModePercent');
+const nlrModeAbsolute=document.getElementById('nlrModeAbsolute');
+const nlrPercentPanel=document.getElementById('nlrPercentPanel');
+const nlrAbsolutePanel=document.getElementById('nlrAbsolutePanel');
+const nlrCbcDate=document.getElementById('nlrCbcDate');
+const nlrSeg=document.getElementById('nlrSeg');
+const nlrBand=document.getElementById('nlrBand');
+const nlrLymPct=document.getElementById('nlrLymPct');
+const nlrAnc=document.getElementById('nlrAnc');
+const nlrAlc=document.getElementById('nlrAlc');
+const nlrOutput=document.getElementById('nlrOutput');
+const nlrResult=document.getElementById('nlrResult');
+const nlrScoreResult=document.getElementById('nlrScoreResult');
+const nlrStatus=document.getElementById('nlrStatus');
+const nlrApplyBtn=document.getElementById('nlrApplyBtn');
+let nlrCalcMode='percent';
+let nlrPending=null;
+
+function setNlrMode(mode){
+  nlrCalcMode=mode;
+  nlrModePercent.classList.toggle('active',mode==='percent');
+  nlrModeAbsolute.classList.toggle('active',mode==='absolute');
+  nlrPercentPanel.style.display=mode==='percent'?'block':'none';
+  nlrAbsolutePanel.style.display=mode==='absolute'?'block':'none';
+  nlrOutput.classList.remove('show');
+  nlrApplyBtn.classList.remove('show');
+  nlrApplyBtn.textContent='Use this NLR in Fukuda score';
+  nlrPending=null;
+}
+nlrModePercent.addEventListener('click',()=>setNlrMode('percent'));
+nlrModeAbsolute.addEventListener('click',()=>setNlrMode('absolute'));
+
+document.getElementById('nlrCalcBtn').addEventListener('click',()=>{
+  nlrOutput.classList.add('show');
+  nlrApplyBtn.classList.remove('show');
+  nlrApplyBtn.textContent='Use this NLR in Fukuda score';
+  nlrStatus.className='nlr-status';
+  nlrPending=null;
+
+  let nlr=null;
+  state.nlrCbcDate=nlrCbcDate.value || null;
+  state.nlrMethod=nlrCalcMode;
+
+  if(nlrCalcMode==='percent'){
+    const seg=parseFloat(nlrSeg.value);
+    const bandRaw=nlrBand.value.trim();
+    const band=bandRaw==='' ? 0 : parseFloat(bandRaw);
+    const lym=parseFloat(nlrLymPct.value);
+    if(!Number.isFinite(seg) || !Number.isFinite(band) || !Number.isFinite(lym) ||
+       seg<0 || band<0 || lym<=0 || seg>100 || band>100 || lym>100 || seg+band>100){
+      nlrResult.textContent='—';
+      nlrScoreResult.textContent='—';
+      nlrStatus.textContent='Enter valid Seg/neutrophil %, optional Band %, and lymphocyte % from the same CBC.';
+      nlrStatus.classList.add('error');
+      return;
+    }
+    nlr=(seg+band)/lym;
+    state.nlrSeg=seg;
+    state.nlrBand=band;
+    state.nlrLymPct=lym;
+    state.nlrAnc=null;
+    state.nlrAlc=null;
+  }else{
+    const anc=parseFloat(nlrAnc.value);
+    const alc=parseFloat(nlrAlc.value);
+    if(!Number.isFinite(anc) || !Number.isFinite(alc) || anc<0 || alc<=0){
+      nlrResult.textContent='—';
+      nlrScoreResult.textContent='—';
+      nlrStatus.textContent='Enter valid ANC and ALC values from the same CBC.';
+      nlrStatus.classList.add('error');
+      return;
+    }
+    nlr=anc/alc;
+    state.nlrAnc=anc;
+    state.nlrAlc=alc;
+    state.nlrSeg=null;
+    state.nlrBand=null;
+    state.nlrLymPct=null;
+  }
+
+  if(!Number.isFinite(nlr) || nlr<0){
+    nlrResult.textContent='—';
+    nlrScoreResult.textContent='—';
+    nlrStatus.textContent='Unable to calculate NLR from these inputs.';
+    nlrStatus.classList.add('error');
+    return;
+  }
+
+  nlrPending=nlr;
+  nlrResult.textContent=nlr.toFixed(2);
+  nlrScoreResult.textContent=nlr>3?'+1 point':'0 points';
+  nlrStatus.textContent=nlr>3
+    ? 'NLR >3 meets the Fukuda NLR risk threshold.'
+    : 'NLR ≤3 does not meet the Fukuda NLR risk threshold.';
+  nlrStatus.classList.add(nlr>3?'alert':'good');
+  nlrApplyBtn.classList.add('show');
+});
+
+nlrApplyBtn.addEventListener('click',()=>{
+  if(!Number.isFinite(nlrPending) || nlrPending<0) return;
+  nlrInput.value=nlrPending.toFixed(2);
+  state.nlr=Number(nlrInput.value);
+  state.nlrSource='CBC calculator';
+  document.getElementById('nlrNext').disabled=false;
+  nlrApplyBtn.textContent='Applied to Fukuda score ✓';
+  updateProgress();
+});
+
 nlrInput.addEventListener('input',()=>{
   const v=parseFloat(nlrInput.value);
   state.nlr=Number.isFinite(v)?v:null;
+  if(document.activeElement===nlrInput) state.nlrSource='manual';
   document.getElementById('nlrNext').disabled=state.nlr===null || v<0;
   updateProgress();
 });
@@ -599,10 +1255,153 @@ baselineInput.addEventListener('input',()=>{
 document.getElementById('baselineNext').addEventListener('click',()=>showStep(7));
 
 const tvdtInput=document.getElementById('tvdtInput');
+const tvdtModeDiameter=document.getElementById('tvdtModeDiameter');
+const tvdtModeVolume=document.getElementById('tvdtModeVolume');
+const tvdtDate1=document.getElementById('tvdtDate1');
+const tvdtDate2=document.getElementById('tvdtDate2');
+const tvdtMeasure1=document.getElementById('tvdtMeasure1');
+const tvdtMeasure2=document.getElementById('tvdtMeasure2');
+const tvdtMeasure1Label=document.getElementById('tvdtMeasure1Label');
+const tvdtMeasure2Label=document.getElementById('tvdtMeasure2Label');
+const tvdtMeasureHelp=document.getElementById('tvdtMeasureHelp');
+const tvdtOutput=document.getElementById('tvdtOutput');
+const tvdtIntervalResult=document.getElementById('tvdtIntervalResult');
+const tvdtDaysResult=document.getElementById('tvdtDaysResult');
+const tvdtYearsResult=document.getElementById('tvdtYearsResult');
+const tvdtScoreResult=document.getElementById('tvdtScoreResult');
+const tvdtStatus=document.getElementById('tvdtStatus');
+const tvdtApplyBtn=document.getElementById('tvdtApplyBtn');
+let tvdtCalcMode='diameter';
+let tvdtPendingYears=null;
+
+function setTvdtMode(mode){
+  tvdtCalcMode=mode;
+  tvdtModeDiameter.classList.toggle('active',mode==='diameter');
+  tvdtModeVolume.classList.toggle('active',mode==='volume');
+  if(mode==='diameter'){
+    tvdtMeasure1Label.textContent='Diameter at 1st study (cm)';
+    tvdtMeasure2Label.textContent='Diameter at 2nd study (cm)';
+    tvdtMeasure1.placeholder='e.g. 1.20';
+    tvdtMeasure2.placeholder='e.g. 1.80';
+    tvdtMeasureHelp.textContent="Enter the same lesion's maximum diameter at both studies. Diameter mode assumes a spherical tumor (volume ∝ diameter³).";
+  }else{
+    tvdtMeasure1Label.textContent='Volume at 1st study (cc)';
+    tvdtMeasure2Label.textContent='Volume at 2nd study (cc)';
+    tvdtMeasure1.placeholder='e.g. 1.5';
+    tvdtMeasure2.placeholder='e.g. 3.2';
+    tvdtMeasureHelp.textContent="Enter the same lesion's measured volume at both studies.";
+  }
+  tvdtOutput.classList.remove('show');
+  tvdtApplyBtn.classList.remove('show');
+  tvdtPendingYears=null;
+}
+tvdtModeDiameter.addEventListener('click',()=>setTvdtMode('diameter'));
+tvdtModeVolume.addEventListener('click',()=>setTvdtMode('volume'));
+
+function parseDateOnlyUTC(value){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [y,m,d]=value.split('-').map(Number);
+  const t=Date.UTC(y,m-1,d);
+  return Number.isFinite(t)?t:null;
+}
+function formatCompactNumber(v,digits=2){
+  return Number(v).toLocaleString(undefined,{maximumFractionDigits:digits});
+}
+document.getElementById('tvdtCalcBtn').addEventListener('click',()=>{
+  const t1=parseDateOnlyUTC(tvdtDate1.value);
+  const t2=parseDateOnlyUTC(tvdtDate2.value);
+  const m1=parseFloat(tvdtMeasure1.value);
+  const m2=parseFloat(tvdtMeasure2.value);
+
+  tvdtOutput.classList.add('show');
+  tvdtApplyBtn.classList.remove('show');
+  tvdtPendingYears=null;
+  tvdtStatus.className='tvdt-status';
+
+  if(t1===null || t2===null || !Number.isFinite(m1) || !Number.isFinite(m2) || m1<=0 || m2<=0){
+    tvdtIntervalResult.textContent='—';
+    tvdtDaysResult.textContent='—';
+    tvdtYearsResult.textContent='—';
+    tvdtScoreResult.textContent='—';
+    tvdtStatus.textContent='Enter two valid study dates and two positive measurements.';
+    tvdtStatus.classList.add('error');
+    return;
+  }
+  const intervalDays=(t2-t1)/86400000;
+  if(intervalDays<=0){
+    tvdtIntervalResult.textContent='—';
+    tvdtDaysResult.textContent='—';
+    tvdtYearsResult.textContent='—';
+    tvdtScoreResult.textContent='—';
+    tvdtStatus.textContent='The second study date must be later than the first study date.';
+    tvdtStatus.classList.add('error');
+    return;
+  }
+
+  const ratio = tvdtCalcMode==='diameter' ? Math.pow(m2/m1,3) : (m2/m1);
+  tvdtIntervalResult.textContent=`${formatCompactNumber(intervalDays,0)} days`;
+
+  if(ratio<=1){
+    tvdtDaysResult.textContent='No positive DT';
+    tvdtYearsResult.textContent='—';
+    tvdtScoreResult.textContent='Not auto-scored';
+    tvdtStatus.textContent='The lesion is stable or smaller at follow-up, so a positive volume-doubling time cannot be calculated from these two studies. If a serial-imaging TV-DT is available, enter it manually above.';
+    tvdtStatus.classList.add('good');
+    state.tvdtMethod=tvdtCalcMode;
+    state.tvdtDate1=tvdtDate1.value;
+    state.tvdtDate2=tvdtDate2.value;
+    state.tvdtMeasure1=m1;
+    state.tvdtMeasure2=m2;
+    state.tvdtCalcDays=null;
+    state.tvdtCalcYears=null;
+    return;
+  }
+
+  const doublingDays = intervalDays*Math.log(2)/Math.log(ratio);
+  const years = doublingDays/365.25;
+  if(!Number.isFinite(doublingDays) || doublingDays<=0 || !Number.isFinite(years)){
+    tvdtDaysResult.textContent='—';
+    tvdtYearsResult.textContent='—';
+    tvdtScoreResult.textContent='—';
+    tvdtStatus.textContent='Unable to calculate TV-DT from these inputs.';
+    tvdtStatus.classList.add('error');
+    return;
+  }
+
+  tvdtDaysResult.textContent=`${formatCompactNumber(doublingDays,1)} days`;
+  tvdtYearsResult.textContent=`${formatCompactNumber(years,3)} years`;
+  tvdtScoreResult.textContent=years<=1?'+1 point':'0 points';
+  tvdtStatus.textContent=years<=1
+    ? 'This 2-study estimate is ≤1 year and meets the Fukuda TV-DT risk threshold.'
+    : 'This 2-study estimate is >1 year and does not meet the Fukuda TV-DT risk threshold.';
+  tvdtStatus.classList.add(years<=1?'alert':'good');
+  tvdtPendingYears=years;
+  tvdtApplyBtn.classList.add('show');
+
+  state.tvdtMethod=tvdtCalcMode;
+  state.tvdtDate1=tvdtDate1.value;
+  state.tvdtDate2=tvdtDate2.value;
+  state.tvdtMeasure1=m1;
+  state.tvdtMeasure2=m2;
+  state.tvdtCalcDays=doublingDays;
+  state.tvdtCalcYears=years;
+});
+
+tvdtApplyBtn.addEventListener('click',()=>{
+  if(!Number.isFinite(tvdtPendingYears) || tvdtPendingYears<=0) return;
+  tvdtInput.value=tvdtPendingYears.toFixed(3);
+  state.tvdt=Number(tvdtInput.value);
+  state.tvdtSource='2-study calculator';
+  document.getElementById('calcBtn').disabled=false;
+  tvdtApplyBtn.textContent='Applied to Fukuda score ✓';
+  updateProgress();
+});
+
 tvdtInput.addEventListener('input',()=>{
   const v=parseFloat(tvdtInput.value);
   state.tvdt=Number.isFinite(v)?v:null;
-  document.getElementById('calcBtn').disabled=state.tvdt===null || v<0;
+  if(document.activeElement===tvdtInput) state.tvdtSource='manual';
+  document.getElementById('calcBtn').disabled=state.tvdt===null || v<=0;
   updateProgress();
 });
 
@@ -613,10 +1412,10 @@ function scoreData(){
     ['Tumor-related symptoms', state.symptoms===1?'Symptomatic':'Asymptomatic', state.symptoms],
     ['Histology', state.histologyLabel, state.histology],
     ['Metastatic sites', state.metastasis===1?'Extrapulmonary disease':'Pulmonary only', state.metastasis],
-    ['NLR', String(state.nlr), state.nlr>3?1:0],
+    ['NLR', `${state.nlr}${state.nlrSource==='CBC calculator'?' (calculated from CBC)':''}`, state.nlr>3?1:0],
     ['Lung metastasis size', lungDisplay, state.lungNo?0:(state.lungSize>=10?1:0)],
     ['Baseline tumor size', `${state.baselineSize} mm`, state.baselineSize>40?1:0],
-    ['TV-DT', `${state.tvdt} years`, state.tvdt<=1?1:0]
+    ['TV-DT', `${state.tvdt} years${state.tvdtSource==='2-study calculator'?' (2-study estimate)':''}`, state.tvdt<=1?1:0]
   ];
   return items;
 }
@@ -626,17 +1425,17 @@ function calculate(){
   const total=items.reduce((a,x)=>a+x[2],0);
   let risk, cls, title, text;
   if(total<=2){
-    risk='Low-risk';cls='low';
-    title='Watch-and-wait approach';
-    text='Score 0–2. The original Fukuda algorithm supports continued active surveillance when otherwise clinically appropriate.';
+    risk='Low risk';cls='low';
+    title='Continue active surveillance';
+    text='Score 0–2. Continued active surveillance may be appropriate when clinically suitable; treatment decisions should remain individualized.';
   } else if(total<=5){
-    risk='Intermediate-risk';cls='mid';
-    title='Consider lenvatinib — proposed optimal window';
-    text='Score 3–5. In the derivation cohort, this was the group the authors regarded as the optimal timing window for starting lenvatinib.';
+    risk='Intermediate risk';cls='mid';
+    title='Consider targeted therapy';
+    text='Total score 3–5. The original study proposed this range as an appropriate window to consider starting targeted therapy. Further physician assessment is recommended.';
   } else {
-    risk='High-risk';cls='high';
-    title='Consider starting lenvatinib';
-    text='Score 6–8. The original algorithm supports treatment consideration; this category also represented a poorer-prognosis group in the derivation cohort.';
+    risk='High risk';cls='high';
+    title='Promptly assess for targeted therapy';
+    text='Total score 6–8. Prompt multidisciplinary assessment of treatment appropriateness, contraindications, and timing is recommended.';
   }
   document.getElementById('totalScore').textContent=total;
   const badge=document.getElementById('riskBadge');
@@ -652,7 +1451,7 @@ function calculate(){
     </div>`).join('');
   lastCalculated = {items,total,risk};
   const saveBtn = document.getElementById('saveRecordBtn');
-  saveBtn.disabled = !state.mrn;
+  saveBtn.disabled = !state.mrn || !state.pretreatmentDate;
   document.getElementById('savedBanner').classList.remove('show');
   document.getElementById('calcForm').style.display='none';
   document.getElementById('progressCard').style.display='none';
@@ -662,11 +1461,22 @@ function calculate(){
 document.getElementById('calcBtn').addEventListener('click',calculate);
 
 function resetAll(){
-  Object.assign(state,{mrn:'',age:null,symptoms:null,histology:null,histologyLabel:null,metastasis:null,nlr:null,lungSize:null,lungNo:false,baselineSize:null,tvdt:null});
+  Object.assign(state,{mrn:'',pretreatmentDate:'',age:null,symptoms:null,histology:null,histologyLabel:null,metastasis:null,
+    nlr:null,nlrSource:'manual',nlrMethod:null,nlrCbcDate:null,nlrSeg:null,nlrBand:null,nlrLymPct:null,nlrAnc:null,nlrAlc:null,
+    lungSize:null,lungNo:false,baselineSize:null,tvdt:null,
+    tvdtSource:'manual',tvdtMethod:null,tvdtDate1:null,tvdtDate2:null,tvdtMeasure1:null,tvdtMeasure2:null,tvdtCalcDays:null,tvdtCalcYears:null});
   lastCalculated = null;
   document.querySelectorAll('input').forEach(i=>{i.value='';i.disabled=false});
   document.getElementById('savedBanner').classList.remove('show');
   document.getElementById('saveRecordBtn').disabled=true;
+  setNlrMode('percent');
+  nlrOutput.classList.remove('show');
+  nlrApplyBtn.classList.remove('show');
+  nlrApplyBtn.textContent='Use this NLR in Fukuda score';
+  setTvdtMode('diameter');
+  tvdtOutput.classList.remove('show');
+  tvdtApplyBtn.classList.remove('show');
+  tvdtApplyBtn.textContent='Use this TV-DT in Fukuda score';
   document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
   document.querySelectorAll('.next').forEach(x=>x.disabled=true);
   ['ageNext','nlrNext','lungNext','baselineNext','calcBtn'].forEach(id=>document.getElementById(id).disabled=true);
@@ -674,15 +1484,40 @@ function resetAll(){
 }
 document.getElementById('resetBtn').addEventListener('click',resetAll);
 
+function exportPdfReport(){
+  if(!lastCalculated){
+    alert('Please complete the Fukuda assessment first.');
+    return;
+  }
+  if(!state.mrn){
+    alert('Please enter the Medical Record Number before exporting the PDF report.');
+    mrnInput.focus();
+    window.scrollTo({top:Math.max(0,document.getElementById('recordCard').offsetTop-15),behavior:'smooth'});
+    return;
+  }
+  const d=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  document.getElementById('pdfMrn').textContent=state.mrn;
+  document.getElementById('pdfDate').textContent=`${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  const originalTitle=document.title;
+  document.title=`Fukuda_Score_${state.mrn}_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+  const restore=()=>{document.title=originalTitle;window.removeEventListener('afterprint',restore)};
+  window.addEventListener('afterprint',restore);
+  window.print();
+}
+document.getElementById('exportPdfBtn').addEventListener('click',exportPdfReport);
+
 document.getElementById('copyBtn').addEventListener('click', async ()=>{
   const items=scoreData();
   const total=items.reduce((a,x)=>a+x[2],0);
-  const risk=total<=2?'Low-risk':total<=5?'Intermediate-risk':'High-risk';
+  const risk=total<=2?'Low risk':total<=5?'Intermediate risk':'High risk';
   const lines=[
     `Fukuda Clinical Indication Score: ${total}/8 (${risk})`,
+    `MRN: ${state.mrn}`,
+    `Pretreatment Date: ${state.pretreatmentDate}`,
     ...items.map(x=>`${x[0]}: ${x[1]} — ${x[2]} point${x[2]===1?'':'s'}`),
     '',
-    'For RR-DTC lenvatinib initiation decision support.',
+    'Clinical decision support for timing of targeted therapy in RR-DTC.',
     'Fukuda N et al. Endocrine. 2022;76(1):70–77.'
   ];
   try{
@@ -698,12 +1533,13 @@ function scoreValueByName(items,name){
   return x ? x[2] : '';
 }
 function buildRecord(){
-  if(!lastCalculated || !state.mrn) return null;
+  if(!lastCalculated || !state.mrn || !state.pretreatmentDate) return null;
   const now = new Date();
   const items = lastCalculated.items;
   return {
     record_id: makeAssessmentId(),
     mrn: state.mrn,
+    pretreatment_date: state.pretreatmentDate,
     assessment_timestamp: isoLocal(now),
     age_years: state.age,
     tumor_related_symptoms: state.symptoms===1 ? 'Symptomatic' : 'Asymptomatic',
@@ -714,6 +1550,14 @@ function buildRecord(){
     metastatic_sites_score: state.metastasis,
     nlr: state.nlr,
     nlr_score: state.nlr>3 ? 1 : 0,
+    nlr_source: state.nlrSource,
+    nlr_calc_method: state.nlrMethod || '',
+    nlr_cbc_date: state.nlrCbcDate || '',
+    nlr_seg_pct: state.nlrSeg ?? '',
+    nlr_band_pct: state.nlrBand ?? '',
+    nlr_lymphocyte_pct: state.nlrLymPct ?? '',
+    nlr_anc: state.nlrAnc ?? '',
+    nlr_alc: state.nlrAlc ?? '',
     lung_metastasis_mm: state.lungNo ? '' : state.lungSize,
     no_lung_metastasis: state.lungNo ? 1 : 0,
     lung_size_score: state.lungNo ? 0 : (state.lungSize>=10 ? 1 : 0),
@@ -721,6 +1565,14 @@ function buildRecord(){
     baseline_size_score: state.baselineSize>40 ? 1 : 0,
     tvdt_years: state.tvdt,
     tvdt_score: state.tvdt<=1 ? 1 : 0,
+    tvdt_source: state.tvdtSource,
+    tvdt_calc_method: state.tvdtMethod || '',
+    tvdt_study1_date: state.tvdtDate1 || '',
+    tvdt_study2_date: state.tvdtDate2 || '',
+    tvdt_measure1: state.tvdtMeasure1 ?? '',
+    tvdt_measure2: state.tvdtMeasure2 ?? '',
+    tvdt_calc_days: state.tvdtCalcDays ?? '',
+    tvdt_calc_years: state.tvdtCalcYears ?? '',
     age_score: state.age>65 ? 1 : 0,
     fukuda_total_score: lastCalculated.total,
     risk_group: lastCalculated.risk
@@ -730,6 +1582,7 @@ document.getElementById('saveRecordBtn').addEventListener('click', ()=>{
   const rec = buildRecord();
   if(!rec){
     if(!state.mrn) mrnInput.focus();
+    else if(!state.pretreatmentDate) pretreatmentDateInput.focus();
     return;
   }
   const records = loadRecords();
@@ -743,51 +1596,85 @@ document.getElementById('saveRecordBtn').addEventListener('click', ()=>{
 const columnDefs = [
   ['record_id','Assessment ID'],
   ['mrn','MRN'],
-  ['assessment_timestamp','Assessment timestamp'],
+  ['pretreatment_date','Pretreatment Date'],
+  ['assessment_timestamp','Assessment Timestamp'],
   ['age_years','Age (years)'],
-  ['age_score','Age score'],
-  ['tumor_related_symptoms','Tumor-related symptoms'],
-  ['symptoms_score','Symptoms score'],
+  ['age_score','Age Score'],
+  ['tumor_related_symptoms','Tumor-related Symptoms'],
+  ['symptoms_score','Symptoms Score'],
   ['histology','Histology'],
-  ['histology_score','Histology score'],
-  ['metastatic_sites','Metastatic sites'],
-  ['metastatic_sites_score','Metastatic sites score'],
+  ['histology_score','Histology Score'],
+  ['metastatic_sites','Metastatic Sites'],
+  ['metastatic_sites_score','Metastatic Sites Score'],
   ['nlr','NLR'],
-  ['nlr_score','NLR score'],
-  ['lung_metastasis_mm','Lung metastasis size (mm)'],
-  ['no_lung_metastasis','No lung metastasis'],
-  ['lung_size_score','Lung size score'],
-  ['baseline_tumor_size_mm','Baseline tumor size (mm)'],
-  ['baseline_size_score','Baseline size score'],
-  ['tvdt_years','TV-DT (years)'],
-  ['tvdt_score','TV-DT score'],
-  ['fukuda_total_score','Fukuda total score'],
-  ['risk_group','Risk group']
-];
+  ['nlr_score','NLR Score'],
+  ['nlr_source','NLR Source'],
+  ['nlr_calc_method','NLR Calculator Method'],
+  ['nlr_cbc_date','NLR CBC Date'],
+  ['nlr_seg_pct','Seg / Neutrophils (%)'],
+  ['nlr_band_pct','Band (%)'],
+  ['nlr_lymphocyte_pct','Lymphocytes (%)'],
+  ['nlr_anc','Absolute Neutrophil Count (ANC)'],
+  ['nlr_alc','Absolute Lymphocyte Count (ALC)'],
+  ['lung_metastasis_mm','Lung Metastasis Size (mm)'],
+  ['no_lung_metastasis','No Lung Metastasis'],
+  ['lung_size_score','Lung Size Score'],
+  ['baseline_tumor_size_mm','Baseline Tumor Size (mm)'],
+  ['baseline_size_score','Baseline Size Score'],
+  ['tvdt_years','TV-DT Used in Score (years)'],
+  ['tvdt_score','TV-DT Score'],
+  ['tvdt_source','TV-DT Source'],
+  ['tvdt_calc_method','TV-DT Calculator Method'],
+  ['tvdt_study1_date','TV-DT Study 1 Date'],
+  ['tvdt_study2_date','TV-DT Study 2 Date'],
+  ['tvdt_measure1','TV-DT Measurement 1'],
+  ['tvdt_measure2','TV-DT Measurement 2'],
+  ['tvdt_calc_days','TV-DT Calculated (days)'],
+  ['tvdt_calc_years','TV-DT Calculated (years)'],
+  ['fukuda_total_score','Fukuda Total Score'],
+  ['risk_group','Risk Group']
+]
 const dataDictionary = [
-  ['record_id','text','Unique assessment ID generated locally'],
+  ['record_id','text','Unique locally generated assessment ID'],
   ['mrn','text','Medical record number'],
-  ['assessment_timestamp','datetime','Local assessment timestamp'],
+  ['pretreatment_date','date','Pretreatment date / baseline date for this Fukuda assessment'],
+  ['assessment_timestamp','datetime','Local assessment date and time'],
   ['age_years','number','Age in years'],
   ['age_score','integer','1 if age >65 years; otherwise 0'],
   ['tumor_related_symptoms','categorical','Asymptomatic / Symptomatic'],
-  ['symptoms_score','integer','1 if symptomatic; otherwise 0'],
+  ['symptoms_score','integer','1 if tumor-related symptoms are present; otherwise 0'],
   ['histology','categorical','PTC / FTC / PDTC'],
   ['histology_score','integer','1 for FTC or PDTC; 0 for PTC'],
   ['metastatic_sites','categorical','Pulmonary only / Extrapulmonary disease'],
   ['metastatic_sites_score','integer','1 for extrapulmonary disease; otherwise 0'],
-  ['nlr','number','Neutrophil-to-lymphocyte ratio'],
+  ['nlr','number','Neutrophil-to-lymphocyte ratio used for Fukuda scoring'],
   ['nlr_score','integer','1 if NLR >3; otherwise 0'],
+  ['nlr_source','categorical','Manual / CBC calculator'],
+  ['nlr_calc_method','categorical','percent / absolute; blank if entered manually'],
+  ['nlr_cbc_date','date','Date of CBC used to calculate NLR'],
+  ['nlr_seg_pct','number','Segmented neutrophil percentage used for NLR calculation'],
+  ['nlr_band_pct','number','Band neutrophil percentage used for NLR calculation; 0 if blank'],
+  ['nlr_lymphocyte_pct','number','Lymphocyte percentage used for NLR calculation'],
+  ['nlr_anc','number','Absolute neutrophil count used for NLR calculation'],
+  ['nlr_alc','number','Absolute lymphocyte count used for NLR calculation'],
   ['lung_metastasis_mm','number','Lung metastasis size in mm; blank if none'],
   ['no_lung_metastasis','integer','1 if no lung metastasis; otherwise 0'],
-  ['lung_size_score','integer','1 if lung metastasis >=10 mm; otherwise 0'],
+  ['lung_size_score','integer','1 if lung metastasis ≥10 mm; otherwise 0'],
   ['baseline_tumor_size_mm','number','Baseline tumor size in mm'],
   ['baseline_size_score','integer','1 if baseline tumor size >40 mm; otherwise 0'],
-  ['tvdt_years','number','Tumor-volume doubling time in years'],
-  ['tvdt_score','integer','1 if TV-DT <=1 year; otherwise 0'],
+  ['tvdt_years','number','Tumor-volume doubling time used for the Fukuda score, in years'],
+  ['tvdt_score','integer','1 if TV-DT ≤1 year; otherwise 0'],
+  ['tvdt_source','categorical','Manual / 2-study calculator'],
+  ['tvdt_calc_method','categorical','diameter / volume; blank if not calculated'],
+  ['tvdt_study1_date','date','Date of first imaging study used for 2-study TV-DT calculation'],
+  ['tvdt_study2_date','date','Date of second imaging study used for 2-study TV-DT calculation'],
+  ['tvdt_measure1','number','First diameter (cm) or volume (cc), depending on calculator method'],
+  ['tvdt_measure2','number','Second diameter (cm) or volume (cc), depending on calculator method'],
+  ['tvdt_calc_days','number','Calculated TV-DT in days from 2-study estimator'],
+  ['tvdt_calc_years','number','Calculated TV-DT in years from 2-study estimator'],
   ['fukuda_total_score','integer','Total Fukuda score, 0–8'],
-  ['risk_group','categorical','Low-risk / Intermediate-risk / High-risk']
-];
+  ['risk_group','categorical','Low risk / Intermediate risk / High risk']
+]
 
 function escHtml(x){
   return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -927,7 +1814,288 @@ document.getElementById('modalExportBtn').addEventListener('click',exportXlsx);
 
 updateRecordCount();
 
+
+function csvEscape(v){
+  const s=String(v??'');
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+}
+function exportGoogleSheetsCsv(){
+  const records=loadRecords();
+  if(!records.length){ alert('No saved registry records to export.'); return; }
+  const rows=[columnDefs.map(c=>c[1]), ...records.map(r=>columnDefs.map(c=>r[c[0]]??''))];
+  const csv='\ufeff'+rows.map(row=>row.map(csvEscape).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  a.href=url;
+  a.download=`Fukuda_RR-DTC_GoogleSheets_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+async function copyForGoogleSheets(){
+  const records=loadRecords();
+  if(!records.length){ alert('No saved registry records to copy.'); return; }
+  const rows=[columnDefs.map(c=>c[1]), ...records.map(r=>columnDefs.map(c=>r[c[0]]??''))];
+  const tsv=rows.map(row=>row.map(v=>String(v??'').replace(/\t/g,' ').replace(/\r?\n/g,' ')).join('\t')).join('\n');
+  try{
+    await navigator.clipboard.writeText(tsv);
+    const t=document.getElementById('toast');
+    t.textContent='Copied. You can now paste directly into Google Sheets.';
+    t.classList.add('show');
+    setTimeout(()=>{t.classList.remove('show');t.textContent='Result copied';},1800);
+  }catch(e){
+    alert('Clipboard access is unavailable in this browser. Please use “Export Google Sheets (CSV)” instead.');
+  }
+}
+document.getElementById('exportSheetsBtn').addEventListener('click',exportGoogleSheetsCsv);
+document.getElementById('copySheetsBtn').addEventListener('click',copyForGoogleSheets);
+document.getElementById('modalSheetsBtn').addEventListener('click',exportGoogleSheetsCsv);
+document.getElementById('modalCopySheetsBtn').addEventListener('click',copyForGoogleSheets);
 updateProgress();
 </script>
+
+<script>
+(function(){
+  const desktopMq=window.matchMedia('(min-width:1100px)');
+  function desktop(){return desktopMq.matches;}
+  function getState(){ try{return state;}catch(e){return null;} }
+  function live(){
+    if(!desktop()) return;
+    const st=getState(); if(!st) return;
+    let done=0,score=0;
+    if(Number.isFinite(st.age)){done++; if(st.age>65)score++;}
+    if(st.symptoms!==null){done++; if(Number(st.symptoms)===1)score++;}
+    if(st.histology!==null){done++; if(Number(st.histology)===1)score++;}
+    if(st.metastasis!==null){done++; if(Number(st.metastasis)===1)score++;}
+    if(Number.isFinite(st.nlr)){done++; if(st.nlr>3)score++;}
+    if(st.lungNo || Number.isFinite(st.lungSize)){done++; if(!st.lungNo && st.lungSize>=10)score++;}
+    if(Number.isFinite(st.baselineSize)){done++; if(st.baselineSize>40)score++;}
+    if(Number.isFinite(st.tvdt)){done++; if(st.tvdt<=1)score++;}
+    const a=document.getElementById('pcLiveScore'),b=document.getElementById('pcLiveRisk');
+    if(a)a.textContent=score+' / 8';
+    if(b){
+      if(done<8){b.textContent=done+'/8 completed';b.style.color='var(--muted)';}
+      else if(score<=2){b.textContent='Low risk';b.style.color='#23734d';}
+      else if(score<=5){b.textContent='Intermediate';b.style.color='#9a6900';}
+      else{b.textContent='High risk';b.style.color='#b13b34';}
+    }
+  }
+  function setup(){
+    if(!desktop())return;
+    const top=document.querySelector('.topbar');
+    if(top && !document.getElementById('pcScoreChip')){
+      const d=document.createElement('div');d.className='pc-score-chip';d.id='pcScoreChip';
+      d.innerHTML='<div><div class="pc-score-kicker">Live Score</div><div class="pc-score-main" id="pcLiveScore">0 / 8</div></div><div class="pc-score-risk" id="pcLiveRisk">0/8 completed</div>';
+      top.appendChild(d);
+    }
+    live();
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    setup();
+    document.addEventListener('input',()=>setTimeout(live,0));
+    document.addEventListener('click',()=>setTimeout(live,0));
+    const calc=document.getElementById('calcBtn');
+    if(calc) calc.addEventListener('click',()=>setTimeout(()=>{
+      if(desktop()){
+        const form=document.getElementById('calcForm');
+        const prog=document.getElementById('progressCard');
+        if(form) form.style.display='grid';
+        if(prog) prog.style.display='none';
+      }
+    },30));
+    const reset=document.getElementById('resetBtn');
+    if(reset) reset.addEventListener('click',()=>setTimeout(()=>{if(desktop()){setup();live();}},30));
+  });
+  desktopMq.addEventListener?.('change',()=>{if(desktop())setup();});
+})();
+</script>
+
+
+<script>
+(function(){
+  const I18N = {
+    'zh-Hant': {"Clinical Calculator": "臨床計算機", "Language": "語言", "Fukuda Clinical Indication Score": "Fukuda 臨床適應症評分", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · 標靶治療時機評估與個案登錄", "Clinical Indication Score": "臨床適應症評分", "When to consider": "何時考慮開始", "targeted therapy": "標靶治療", "Uses the 8-item Fukuda clinical score to support timing of targeted therapy initiation in patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC).": "依 Fukuda 等人提出的 8 項臨床指標，協助評估放射性碘難治型分化型甲狀腺癌（RR-DTC）開始標靶治療的適當時機。", "Intended population:": "適用對象：", "patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC). This tool supports treatment-timing assessment and does not replace full clinical evaluation of indications, contraindications, or patient preferences.": "放射性碘難治型分化型甲狀腺癌（RR-DTC）。本工具僅協助判斷治療時機，不取代醫師對適應症、禁忌症及病人偏好的完整臨床評估。", "Patient Record": "病人資料", "Medical Record Number (MRN) *": "病歷號碼（MRN）*", "Pretreatment Date *": "治療前評估日期 *", "MRN and Pretreatment Date are required before saving a result to the registry.": "儲存個案前必須輸入病歷號碼與治療前評估日期。", "Registry data are stored only in this browser on this device and are not automatically uploaded to a server. For clinical or research deployment, use an institution-approved secure environment.": "個案資料僅儲存在本裝置的瀏覽器，不會自動上傳伺服器。正式臨床或研究使用時，請部署於院方核准的安全環境。", "View Registry": "查看個案資料", "Export Excel (.xlsx)": "匯出 Excel (.xlsx)", "Export Google Sheets (CSV)": "匯出 Google Sheets (CSV)", "Copy for Google Sheets": "複製到 Google Sheets", "Google Sheets: export a UTF-8 CSV for import, or copy the entire dataset and paste it directly into Google Sheets. MRNs are sensitive data; use only institution-approved accounts and storage.": "Google Sheets：可匯出 UTF-8 CSV，或複製整份資料後直接貼入 Google Sheets。病歷號碼屬敏感資料，請僅使用院方核准的帳號與儲存空間。", "How old is the patient?": "病人目前年齡？", "Use the patient’s age at the current treatment-timing assessment.": "以本次評估是否開始標靶治療時的年齡為準。", "years": "歲", "Fukuda threshold:": "Fukuda 評分標準：", "Next →": "下一題 →", "← Back": "← 上一題", "Tumor-related symptoms?": "是否有腫瘤相關症狀？", "Examples include hemoptysis/bloody sputum, cough, pain, or dyspnea related to tumor burden.": "例如咳血／血痰、咳嗽、疼痛或因腫瘤負荷造成的呼吸困難等。", "Asymptomatic": "無症狀", "No tumor-related symptoms": "無腫瘤相關症狀", "Symptomatic": "有症狀", "Tumor-related symptoms present": "有腫瘤相關症狀", "Histological subtype?": "病理組織型態？", "Classified according to the original Fukuda clinical indication score.": "依 Fukuda 原始臨床適應症評分之病理分類。", "Papillary thyroid cancer (PTC)": "乳突型甲狀腺癌（PTC）", "Follicular thyroid cancer (FTC)": "濾泡型甲狀腺癌（FTC）", "Poorly differentiated thyroid cancer (PDTC)": "低分化甲狀腺癌（PDTC）", "Metastatic sites?": "遠端轉移部位？", "This item distinguishes pulmonary-only disease from extrapulmonary metastatic disease; it does not count the number of metastatic sites.": "此項區分「僅肺轉移」與「有肺外轉移」，並非計算轉移部位數量。", "Pulmonary only": "僅肺轉移", "Metastases confined to the lung": "遠端轉移僅位於肺部", "Extrapulmonary disease": "有肺外轉移", "Any metastatic disease outside the lung": "任何肺部以外的遠端轉移", "Neutrophil-to-lymphocyte ratio (NLR)": "嗜中性球／淋巴球比值（NLR）", "Enter a known pretreatment NLR directly, or calculate it from the same pretreatment CBC below.": "可直接輸入已知的治療前 NLR，或使用下方同一次治療前 CBC 自動計算。", "Calculate NLR from pretreatment CBC": "由治療前 CBC 計算 NLR", "CBC date": "CBC 日期", "CBC differential (%)": "白血球分類（%）", "Absolute counts": "絕對計數", "Use values from the same CBC. If Band is reported separately, it is added to Seg automatically.": "請使用同一次 CBC 的數值；若 Band 分開報告，系統會自動加到 Seg。", "Seg / neutrophils (%)": "Seg／嗜中性球（%）", "Band (%) — optional": "Band（%）— 選填", "Lymphocytes (%)": "淋巴球（%）", "Enter ANC and ALC from the same CBC. Units cancel as long as both counts use the same unit.": "請輸入同一次 CBC 的 ANC 與 ALC；兩者使用相同單位即可。", "Absolute neutrophil count (ANC)": "嗜中性球絕對值（ANC）", "Absolute lymphocyte count (ALC)": "淋巴球絕對值（ALC）", "Calculate NLR": "計算 NLR", "Calculated NLR": "計算後 NLR", "Fukuda NLR item": "Fukuda NLR 項目", "Use this NLR in Fukuda score": "將此 NLR 帶入 Fukuda 評分", "Applied to Fukuda score ✓": "已帶入 Fukuda 評分 ✓", "NLR >3 meets the Fukuda NLR risk threshold.": "NLR >3，符合 Fukuda NLR 風險門檻。", "NLR ≤3 does not meet the Fukuda NLR risk threshold.": "NLR ≤3，不符合 Fukuda NLR 風險門檻。", "Enter valid Seg/neutrophil %, optional Band %, and lymphocyte % from the same CBC.": "請輸入同一次 CBC 的有效 Seg／嗜中性球%、Band%（選填）及淋巴球%。", "Enter valid ANC and ALC values from the same CBC.": "請輸入同一次 CBC 的有效 ANC 與 ALC。", "Unable to calculate NLR from these inputs.": "無法由目前輸入值計算 NLR。", "NLR = neutrophils ÷ lymphocytes. With CBC differential percentages, NLR = (Seg + Band) ÷ Lymphocytes. Use a pretreatment CBC collected as close as clinically appropriate to the treatment-timing assessment.": "NLR＝嗜中性球 ÷ 淋巴球。若使用白血球分類百分比，NLR＝（Seg + Band）÷ Lymphocytes。建議使用最接近治療時機評估、且臨床上適當的治療前 CBC。", "Size of lung metastasis?": "肺轉移病灶大小？", "No lung metastasis": "無肺轉移", "No pulmonary metastatic lesion": "無肺部轉移病灶", "Baseline tumor size?": "基準腫瘤大小？", "Use baseline tumor size at the current treatment-timing assessment.": "以本次治療時機評估時的基準腫瘤大小為準。", "Tumor-volume doubling time (TV-DT)?": "腫瘤體積倍增時間（TV-DT）？", "Enter a known TV-DT directly, or calculate a quick 2-study estimate below.": "可直接輸入已知 TV-DT，或使用下方兩次影像快速估算。", "Calculate TV-DT from two imaging studies": "由兩次影像計算 TV-DT", "Diameter": "直徑", "Volume": "體積", "Date of 1st study": "第一次影像日期", "Date of 2nd study": "第二次影像日期", "Enter the same lesion's maximum diameter at both studies. Diameter mode assumes a spherical tumor (volume ∝ diameter³).": "請輸入同一病灶於兩次影像的最大直徑。直徑模式假設腫瘤為球形（體積 ∝ 直徑³）。", "Diameter at 1st study (cm)": "第一次影像直徑（cm）", "Diameter at 2nd study (cm)": "第二次影像直徑（cm）", "Enter the same lesion's measured volume at both studies.": "請輸入同一病灶於兩次影像量測的體積。", "Volume at 1st study (cc)": "第一次影像體積（cc）", "Volume at 2nd study (cc)": "第二次影像體積（cc）", "Calculate TV-DT": "計算 TV-DT", "Study interval": "影像間隔", "TV-DT (years)": "TV-DT（年）", "Fukuda TV-DT item": "Fukuda TV-DT 項目", "Use this TV-DT in Fukuda score": "將此 TV-DT 帶入 Fukuda 評分", "This 2-study estimate is ≤1 year and meets the Fukuda TV-DT risk threshold.": "兩次影像估算的 TV-DT ≤1 年，符合 Fukuda TV-DT 風險門檻。", "This 2-study estimate is >1 year and does not meet the Fukuda TV-DT risk threshold.": "兩次影像估算的 TV-DT >1 年，不符合 Fukuda TV-DT 風險門檻。", "Enter two valid study dates and two positive measurements.": "請輸入兩個有效影像日期及兩個大於 0 的量測值。", "The second study date must be later than the first study date.": "第二次影像日期必須晚於第一次影像日期。", "The lesion is stable or smaller at follow-up, so a positive volume-doubling time cannot be calculated from these two studies. If a serial-imaging TV-DT is available, enter it manually above.": "追蹤時病灶穩定或縮小，因此無法由這兩次影像計算正值的體積倍增時間；若已有序列影像計算的 TV-DT，請於上方手動輸入。", "Unable to calculate TV-DT from these inputs.": "無法由目前輸入值計算 TV-DT。", "Quick 2-study estimator adapted from the Radiology Tutor tumour volume doubling-time calculator:": "此兩次影像快速估算工具參考 Radiology Tutor 腫瘤體積倍增時間計算器：", "If the lesion is stable or smaller at follow-up, a positive doubling time cannot be calculated.": "若追蹤時病灶穩定或縮小，則無法計算正值的倍增時間。", "Calculate Score": "計算評分", "Fukuda Clinical Indication Score Report": "Fukuda 臨床適應症評分報告", "Radioiodine-Refractory Differentiated Thyroid Cancer (RR-DTC) · Targeted Therapy Timing Assessment": "放射性碘難治型分化型甲狀腺癌（RR-DTC）· 標靶治療時機評估", "Medical Record Number：": "病歷號碼：", "Assessment Date：": "評估日期：", "Low risk": "低風險", "Intermediate risk": "中度風險", "High risk": "高風險", "Continue active surveillance": "建議持續密切追蹤", "Consider targeted therapy": "建議評估標靶治療", "Promptly assess for targeted therapy": "建議積極評估標靶治療", "Score 0–2. Continued active surveillance may be appropriate when clinically suitable; treatment decisions should remain individualized.": "總分 0–2 分。若臨床狀況允許，可持續密切追蹤；治療決策仍應個別化。", "Total score 3–5. The original study proposed this range as an appropriate window to consider starting targeted therapy. Further physician assessment is recommended.": "總分 3–5 分。原始研究認為此區間可作為考慮開始標靶治療的適當時機，建議由醫師進一步評估。", "Total score 6–8. Prompt multidisciplinary assessment of treatment appropriateness, contraindications, and timing is recommended.": "總分 6–8 分。建議儘速由多專科團隊評估標靶治療之適應性、禁忌症與開始時機。", "Score Breakdown": "各項評分明細", "Save to Registry": "儲存至個案資料庫", "Saved to local registry.": "已儲存至本機個案資料庫。", "Start Over": "重新評估", "Copy Result": "複製結果", "Export PDF Report": "輸出 PDF 報告", "Interpretation": "結果解讀", "continued active surveillance may be appropriate when clinically suitable.": "若臨床狀況允許，可持續密切追蹤。", "the original study proposed this range as the optimal window to consider initiating targeted therapy.": "原始研究認為此區間可能是考慮開始標靶治療的適當治療時機。", "prompt multidisciplinary assessment for targeted therapy initiation is recommended.": "建議儘速由多專科團隊評估是否開始標靶治療。", "Reference:": "參考文獻：", "Original derivation: single-center retrospective cohort (n=59). This score is intended as clinical decision support only.": "原始研究為單中心回溯性世代研究（n=59）；本評分僅作為臨床決策輔助。", "TV-DT calculator reference:": "TV-DT 計算器參考：", "For clinical care and case management · Includes NLR + 2-study TV-DT calculators · Supports PDF / Excel / Google Sheets export · Not a substitute for multidisciplinary clinical judgment": "供臨床照護與個案管理使用 · 包含 NLR 與兩次影像 TV-DT 計算器 · 支援 PDF / Excel / Google Sheets 匯出 · 不取代多專科臨床判斷", "Developed by": "Developed by", "Fukuda Registry": "Fukuda 個案資料庫", "New Assessment": "新增評估", "Delete All Local Records": "刪除全部本機資料", "Result copied": "結果已複製", "Live Score": "即時計分", "Incomplete": "未完成", "Intermediate": "中度風險", "Age": "年齡", "Tumor-related symptoms": "腫瘤相關症狀", "Histology": "病理組織", "Metastatic sites": "遠端轉移部位", "Lung metastasis size": "肺轉移病灶大小", "Baseline tumor size": "基準腫瘤大小", "TV-DT": "TV-DT", "manual": "手動輸入", "calculated from CBC": "由 CBC 計算", "2-study estimate": "兩次影像估算", "No positive DT": "無正值倍增時間", "Not auto-scored": "不自動評分", "Delete": "刪除", "Close": "關閉"},
+    'ja': {"Clinical Calculator": "臨床計算ツール", "Language": "言語", "Fukuda Clinical Indication Score": "Fukuda 臨床適応スコア", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · 分子標的治療の開始時期評価・症例登録", "Clinical Indication Score": "臨床適応スコア", "When to consider": "いつ", "targeted therapy": "分子標的治療を検討するか", "Uses the 8-item Fukuda clinical score to support timing of targeted therapy initiation in patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC).": "Fukuda らの8項目の臨床スコアを用いて、放射性ヨウ素不応性分化型甲状腺癌（RR-DTC）における分子標的治療開始時期の判断を支援します。", "Intended population:": "対象：", "patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC). This tool supports treatment-timing assessment and does not replace full clinical evaluation of indications, contraindications, or patient preferences.": "放射性ヨウ素不応性分化型甲状腺癌（RR-DTC）。本ツールは治療開始時期の判断支援を目的とし、適応・禁忌・患者希望を含む総合的な臨床判断に代わるものではありません。", "Patient Record": "患者情報", "Medical Record Number (MRN) *": "診療録番号（MRN）*", "Pretreatment Date *": "治療前評価日 *", "MRN and Pretreatment Date are required before saving a result to the registry.": "登録前にMRNと治療前評価日の入力が必要です。", "Registry data are stored only in this browser on this device and are not automatically uploaded to a server. For clinical or research deployment, use an institution-approved secure environment.": "登録データはこの端末のブラウザ内にのみ保存され、自動的にサーバーへ送信されません。臨床・研究利用では施設承認済みの安全な環境を使用してください。", "View Registry": "症例登録を見る", "Export Excel (.xlsx)": "Excelを書き出す (.xlsx)", "Export Google Sheets (CSV)": "Google Sheets用CSVを書き出す", "Copy for Google Sheets": "Google Sheets用にコピー", "Google Sheets: export a UTF-8 CSV for import, or copy the entire dataset and paste it directly into Google Sheets. MRNs are sensitive data; use only institution-approved accounts and storage.": "Google SheetsにはUTF-8 CSVをインポートするか、全データをコピーして貼り付けられます。MRNは機微情報のため、施設承認済みのアカウントと保存領域のみを使用してください。", "How old is the patient?": "患者の年齢は？", "Use the patient’s age at the current treatment-timing assessment.": "今回の治療開始時期評価時点の年齢を入力してください。", "years": "歳", "Fukuda threshold:": "Fukuda基準：", "Next →": "次へ →", "← Back": "← 戻る", "Tumor-related symptoms?": "腫瘍関連症状はありますか？", "Examples include hemoptysis/bloody sputum, cough, pain, or dyspnea related to tumor burden.": "喀血／血痰、咳、疼痛、腫瘍負荷に伴う呼吸困難などが含まれます。", "Asymptomatic": "無症状", "No tumor-related symptoms": "腫瘍関連症状なし", "Symptomatic": "症状あり", "Tumor-related symptoms present": "腫瘍関連症状あり", "Histological subtype?": "組織型は？", "Classified according to the original Fukuda clinical indication score.": "Fukuda原著の臨床適応スコアに基づく分類です。", "Papillary thyroid cancer (PTC)": "乳頭癌（PTC）", "Follicular thyroid cancer (FTC)": "濾胞癌（FTC）", "Poorly differentiated thyroid cancer (PDTC)": "低分化甲状腺癌（PDTC）", "Metastatic sites?": "遠隔転移部位は？", "This item distinguishes pulmonary-only disease from extrapulmonary metastatic disease; it does not count the number of metastatic sites.": "肺転移のみか、肺外転移があるかを評価します。転移部位数を数える項目ではありません。", "Pulmonary only": "肺転移のみ", "Metastases confined to the lung": "遠隔転移は肺のみ", "Extrapulmonary disease": "肺外転移あり", "Any metastatic disease outside the lung": "肺以外の遠隔転移を認める", "Neutrophil-to-lymphocyte ratio (NLR)": "好中球／リンパ球比（NLR）", "Enter a known pretreatment NLR directly, or calculate it from the same pretreatment CBC below.": "既知の治療前NLRを直接入力するか、下の同一CBCから計算できます。", "Calculate NLR from pretreatment CBC": "治療前CBCからNLRを計算", "CBC date": "CBC採血日", "CBC differential (%)": "白血球分画（%）", "Absolute counts": "絶対数", "Use values from the same CBC. If Band is reported separately, it is added to Seg automatically.": "同一CBCの値を使用してください。Bandが別項目の場合はSegに自動加算します。", "Seg / neutrophils (%)": "Seg／好中球（%）", "Band (%) — optional": "Band（%）— 任意", "Lymphocytes (%)": "リンパ球（%）", "Enter ANC and ALC from the same CBC. Units cancel as long as both counts use the same unit.": "同一CBCのANCとALCを入力してください。両者が同じ単位であれば計算可能です。", "Absolute neutrophil count (ANC)": "好中球絶対数（ANC）", "Absolute lymphocyte count (ALC)": "リンパ球絶対数（ALC）", "Calculate NLR": "NLRを計算", "Calculated NLR": "計算NLR", "Fukuda NLR item": "Fukuda NLR項目", "Use this NLR in Fukuda score": "このNLRをFukudaスコアに使用", "Applied to Fukuda score ✓": "Fukudaスコアに反映済み ✓", "NLR >3 meets the Fukuda NLR risk threshold.": "NLR >3で、Fukuda NLRリスク基準を満たします。", "NLR ≤3 does not meet the Fukuda NLR risk threshold.": "NLR ≤3で、Fukuda NLRリスク基準を満たしません。", "Enter valid Seg/neutrophil %, optional Band %, and lymphocyte % from the same CBC.": "同一CBCの有効なSeg／好中球%、Band%（任意）、リンパ球%を入力してください。", "Enter valid ANC and ALC values from the same CBC.": "同一CBCの有効なANCとALCを入力してください。", "Unable to calculate NLR from these inputs.": "入力値からNLRを計算できません。", "NLR = neutrophils ÷ lymphocytes. With CBC differential percentages, NLR = (Seg + Band) ÷ Lymphocytes. Use a pretreatment CBC collected as close as clinically appropriate to the treatment-timing assessment.": "NLR＝好中球÷リンパ球。白血球分画を用いる場合は（Seg＋Band）÷リンパ球です。治療開始時期評価に臨床的に近い治療前CBCを使用してください。", "Size of lung metastasis?": "肺転移病変の大きさは？", "No lung metastasis": "肺転移なし", "No pulmonary metastatic lesion": "肺転移病変なし", "Baseline tumor size?": "ベースライン腫瘍径は？", "Use baseline tumor size at the current treatment-timing assessment.": "今回の治療開始時期評価時点のベースライン腫瘍径を使用してください。", "Tumor-volume doubling time (TV-DT)?": "腫瘍体積倍加時間（TV-DT）は？", "Enter a known TV-DT directly, or calculate a quick 2-study estimate below.": "既知のTV-DTを直接入力するか、下で2回の画像から簡易推定できます。", "Calculate TV-DT from two imaging studies": "2回の画像からTV-DTを計算", "Diameter": "直径", "Volume": "体積", "Date of 1st study": "1回目の画像日", "Date of 2nd study": "2回目の画像日", "Enter the same lesion's maximum diameter at both studies. Diameter mode assumes a spherical tumor (volume ∝ diameter³).": "同一病変の最大径を2回とも入力してください。直径モードでは腫瘍を球形と仮定します（体積 ∝ 直径³）。", "Diameter at 1st study (cm)": "1回目の直径（cm）", "Diameter at 2nd study (cm)": "2回目の直径（cm）", "Enter the same lesion's measured volume at both studies.": "同一病変の測定体積を2回とも入力してください。", "Volume at 1st study (cc)": "1回目の体積（cc）", "Volume at 2nd study (cc)": "2回目の体積（cc）", "Calculate TV-DT": "TV-DTを計算", "Study interval": "検査間隔", "TV-DT (years)": "TV-DT（年）", "Fukuda TV-DT item": "Fukuda TV-DT項目", "Use this TV-DT in Fukuda score": "このTV-DTをFukudaスコアに使用", "This 2-study estimate is ≤1 year and meets the Fukuda TV-DT risk threshold.": "2回画像による推定TV-DTは≤1年で、Fukuda TV-DTリスク基準を満たします。", "This 2-study estimate is >1 year and does not meet the Fukuda TV-DT risk threshold.": "2回画像による推定TV-DTは>1年で、Fukuda TV-DTリスク基準を満たしません。", "Enter two valid study dates and two positive measurements.": "有効な2つの画像日と、0より大きい2つの測定値を入力してください。", "The second study date must be later than the first study date.": "2回目の画像日は1回目より後である必要があります。", "The lesion is stable or smaller at follow-up, so a positive volume-doubling time cannot be calculated from these two studies. If a serial-imaging TV-DT is available, enter it manually above.": "追跡時に病変が不変または縮小しているため、この2回の画像から正の倍加時間は計算できません。連続画像から算出したTV-DTがあれば上欄に手入力してください。", "Unable to calculate TV-DT from these inputs.": "入力値からTV-DTを計算できません。", "Quick 2-study estimator adapted from the Radiology Tutor tumour volume doubling-time calculator:": "Radiology Tutorの腫瘍体積倍加時間計算を参考にした2回画像の簡易推定：", "If the lesion is stable or smaller at follow-up, a positive doubling time cannot be calculated.": "追跡時に病変が不変または縮小している場合、正の倍加時間は計算できません。", "Calculate Score": "スコアを計算", "Fukuda Clinical Indication Score Report": "Fukuda 臨床適応スコア報告書", "Radioiodine-Refractory Differentiated Thyroid Cancer (RR-DTC) · Targeted Therapy Timing Assessment": "放射性ヨウ素不応性分化型甲状腺癌（RR-DTC）· 分子標的治療開始時期評価", "Medical Record Number：": "診療録番号：", "Assessment Date：": "評価日時：", "Low risk": "低リスク", "Intermediate risk": "中間リスク", "High risk": "高リスク", "Continue active surveillance": "積極的経過観察を継続", "Consider targeted therapy": "分子標的治療を検討", "Promptly assess for targeted therapy": "分子標的治療を速やかに評価", "Score 0–2. Continued active surveillance may be appropriate when clinically suitable; treatment decisions should remain individualized.": "合計0–2点。臨床的に適切であれば積極的経過観察を継続でき、治療判断は個別化すべきです。", "Total score 3–5. The original study proposed this range as an appropriate window to consider starting targeted therapy. Further physician assessment is recommended.": "合計3–5点。原著では分子標的治療開始を検討する適切な時期として提案されており、医師による追加評価を推奨します。", "Total score 6–8. Prompt multidisciplinary assessment of treatment appropriateness, contraindications, and timing is recommended.": "合計6–8点。適応、禁忌、開始時期について多職種で速やかに評価することを推奨します。", "Score Breakdown": "スコア内訳", "Save to Registry": "症例登録に保存", "Saved to local registry.": "ローカル症例登録に保存しました。", "Start Over": "最初から", "Copy Result": "結果をコピー", "Export PDF Report": "PDF報告書を書き出す", "Interpretation": "解釈", "continued active surveillance may be appropriate when clinically suitable.": "臨床的に適切であれば積極的経過観察を継続できます。", "the original study proposed this range as the optimal window to consider initiating targeted therapy.": "原著では分子標的治療開始を検討する適切な時期として提案されています。", "prompt multidisciplinary assessment for targeted therapy initiation is recommended.": "分子標的治療開始について多職種で速やかに評価することを推奨します。", "Reference:": "参考文献：", "Original derivation: single-center retrospective cohort (n=59). This score is intended as clinical decision support only.": "原著は単施設後ろ向きコホート（n=59）であり、本スコアは臨床意思決定支援のみを目的とします。", "TV-DT calculator reference:": "TV-DT計算の参考：", "For clinical care and case management · Includes NLR + 2-study TV-DT calculators · Supports PDF / Excel / Google Sheets export · Not a substitute for multidisciplinary clinical judgment": "臨床診療・症例管理用 · NLRおよび2回画像TV-DT計算機能 · PDF / Excel / Google Sheets出力対応 · 多職種による臨床判断の代替ではありません", "Developed by": "Developed by", "Fukuda Registry": "Fukuda 症例登録", "New Assessment": "新規評価", "Delete All Local Records": "ローカルデータをすべて削除", "Result copied": "結果をコピーしました", "Live Score": "リアルタイムスコア", "Incomplete": "未完了", "Intermediate": "中間リスク", "Age": "年齢", "Tumor-related symptoms": "腫瘍関連症状", "Histology": "組織型", "Metastatic sites": "転移部位", "Lung metastasis size": "肺転移径", "Baseline tumor size": "ベースライン腫瘍径", "TV-DT": "TV-DT", "manual": "手入力", "calculated from CBC": "CBCから計算", "2-study estimate": "2回画像推定", "No positive DT": "正の倍加時間なし", "Not auto-scored": "自動採点なし", "Delete": "削除", "Close": "閉じる"},
+    'ko': {"Clinical Calculator": "임상 계산기", "Language": "언어", "Fukuda Clinical Indication Score": "Fukuda 임상 적응증 점수", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · 표적치료 시작 시점 평가 및 증례 등록", "Clinical Indication Score": "임상 적응증 점수", "When to consider": "언제", "targeted therapy": "표적치료를 고려할 것인가", "Uses the 8-item Fukuda clinical score to support timing of targeted therapy initiation in patients with radioiodine-refractory differentiated thyroid cancer (RR-DTC).": "Fukuda 8항목 임상 점수를 이용하여 방사성요오드 불응성 분화갑상선암(RR-DTC)에서 표적치료 시작 시점 판단을 지원합니다.", "Intended population:": "대상 환자:", "Patient Record": "환자 정보", "Medical Record Number (MRN) *": "의무기록번호(MRN) *", "Pretreatment Date *": "치료 전 평가일 *", "MRN and Pretreatment Date are required before saving a result to the registry.": "등록 전 MRN과 치료 전 평가일을 입력해야 합니다.", "View Registry": "증례 등록 보기", "Export Excel (.xlsx)": "Excel 내보내기 (.xlsx)", "Export Google Sheets (CSV)": "Google Sheets용 CSV 내보내기", "Copy for Google Sheets": "Google Sheets용 복사", "How old is the patient?": "환자의 나이는?", "years": "세", "Fukuda threshold:": "Fukuda 기준:", "Next →": "다음 →", "← Back": "← 이전", "Tumor-related symptoms?": "종양 관련 증상이 있습니까?", "Asymptomatic": "무증상", "No tumor-related symptoms": "종양 관련 증상 없음", "Symptomatic": "증상 있음", "Tumor-related symptoms present": "종양 관련 증상 있음", "Histological subtype?": "조직학적 아형은?", "Papillary thyroid cancer (PTC)": "유두갑상선암(PTC)", "Follicular thyroid cancer (FTC)": "여포갑상선암(FTC)", "Poorly differentiated thyroid cancer (PDTC)": "저분화갑상선암(PDTC)", "Metastatic sites?": "전이 부위는?", "Pulmonary only": "폐 전이만", "Metastases confined to the lung": "폐에만 전이", "Extrapulmonary disease": "폐외 전이", "Any metastatic disease outside the lung": "폐 이외 전이 존재", "Neutrophil-to-lymphocyte ratio (NLR)": "호중구/림프구 비율(NLR)", "Enter a known pretreatment NLR directly, or calculate it from the same pretreatment CBC below.": "치료 전 NLR을 직접 입력하거나 동일한 CBC로 계산할 수 있습니다.", "Calculate NLR from pretreatment CBC": "치료 전 CBC로 NLR 계산", "CBC date": "CBC 날짜", "CBC differential (%)": "백혈구 감별계수(%)", "Absolute counts": "절대수치", "Seg / neutrophils (%)": "Seg / 호중구(%)", "Band (%) — optional": "Band(%) — 선택", "Lymphocytes (%)": "림프구(%)", "Absolute neutrophil count (ANC)": "절대 호중구 수(ANC)", "Absolute lymphocyte count (ALC)": "절대 림프구 수(ALC)", "Calculate NLR": "NLR 계산", "Calculated NLR": "계산된 NLR", "Fukuda NLR item": "Fukuda NLR 항목", "Use this NLR in Fukuda score": "이 NLR을 Fukuda 점수에 적용", "Applied to Fukuda score ✓": "Fukuda 점수에 적용됨 ✓", "NLR >3 meets the Fukuda NLR risk threshold.": "NLR >3으로 Fukuda NLR 위험 기준을 충족합니다.", "NLR ≤3 does not meet the Fukuda NLR risk threshold.": "NLR ≤3으로 Fukuda NLR 위험 기준을 충족하지 않습니다.", "Size of lung metastasis?": "폐 전이 병변 크기는?", "No lung metastasis": "폐 전이 없음", "Baseline tumor size?": "기준 종양 크기는?", "Tumor-volume doubling time (TV-DT)?": "종양체적 배가시간(TV-DT)은?", "Enter a known TV-DT directly, or calculate a quick 2-study estimate below.": "알려진 TV-DT를 입력하거나 두 번의 영상으로 빠르게 계산할 수 있습니다.", "Calculate TV-DT from two imaging studies": "두 영상으로 TV-DT 계산", "Diameter": "직경", "Volume": "체적", "Date of 1st study": "첫 영상 날짜", "Date of 2nd study": "두 번째 영상 날짜", "Calculate TV-DT": "TV-DT 계산", "Study interval": "검사 간격", "TV-DT (years)": "TV-DT(년)", "Fukuda TV-DT item": "Fukuda TV-DT 항목", "Use this TV-DT in Fukuda score": "이 TV-DT를 Fukuda 점수에 적용", "Calculate Score": "점수 계산", "Fukuda Clinical Indication Score Report": "Fukuda 임상 적응증 점수 보고서", "Low risk": "저위험", "Intermediate risk": "중간위험", "High risk": "고위험", "Continue active surveillance": "적극적 추적관찰 지속", "Consider targeted therapy": "표적치료 고려", "Promptly assess for targeted therapy": "표적치료를 신속히 평가", "Score Breakdown": "점수 세부내역", "Save to Registry": "증례 등록에 저장", "Saved to local registry.": "로컬 증례 등록에 저장됨", "Start Over": "처음부터", "Copy Result": "결과 복사", "Export PDF Report": "PDF 보고서 내보내기", "Interpretation": "해석", "Reference:": "참고문헌:", "Fukuda Registry": "Fukuda 증례 등록", "New Assessment": "새 평가", "Delete All Local Records": "모든 로컬 데이터 삭제", "Live Score": "실시간 점수", "Incomplete": "미완료", "Intermediate": "중간위험", "Age": "나이", "Tumor-related symptoms": "종양 관련 증상", "Histology": "조직형", "Metastatic sites": "전이 부위", "Lung metastasis size": "폐 전이 크기", "Baseline tumor size": "기준 종양 크기", "manual": "수동 입력", "calculated from CBC": "CBC로 계산", "2-study estimate": "두 영상 추정", "Delete": "삭제", "Close": "닫기"},
+    'es': {"Clinical Calculator": "Calculadora clínica", "Language": "Idioma", "Fukuda Clinical Indication Score": "Puntuación de indicación clínica de Fukuda", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · Momento de terapia dirigida y registro de casos", "Clinical Indication Score": "Puntuación de indicación clínica", "When to consider": "Cuándo considerar", "targeted therapy": "terapia dirigida", "Patient Record": "Datos del paciente", "Medical Record Number (MRN) *": "Número de historia clínica (MRN) *", "Pretreatment Date *": "Fecha pretratamiento *", "View Registry": "Ver registro", "Export Excel (.xlsx)": "Exportar Excel (.xlsx)", "Export Google Sheets (CSV)": "Exportar para Google Sheets (CSV)", "Copy for Google Sheets": "Copiar para Google Sheets", "How old is the patient?": "¿Qué edad tiene el paciente?", "years": "años", "Fukuda threshold:": "Umbral de Fukuda:", "Next →": "Siguiente →", "← Back": "← Atrás", "Tumor-related symptoms?": "¿Síntomas relacionados con el tumor?", "Asymptomatic": "Asintomático", "No tumor-related symptoms": "Sin síntomas relacionados con el tumor", "Symptomatic": "Sintomático", "Tumor-related symptoms present": "Síntomas relacionados con el tumor presentes", "Histological subtype?": "¿Subtipo histológico?", "Papillary thyroid cancer (PTC)": "Cáncer papilar de tiroides (PTC)", "Follicular thyroid cancer (FTC)": "Cáncer folicular de tiroides (FTC)", "Poorly differentiated thyroid cancer (PDTC)": "Cáncer de tiroides poco diferenciado (PDTC)", "Metastatic sites?": "¿Sitios metastásicos?", "Pulmonary only": "Solo pulmonar", "Extrapulmonary disease": "Enfermedad extrapulmonar", "Neutrophil-to-lymphocyte ratio (NLR)": "Índice neutrófilos/linfocitos (NLR)", "Calculate NLR from pretreatment CBC": "Calcular NLR a partir del hemograma pretratamiento", "CBC date": "Fecha del hemograma", "CBC differential (%)": "Fórmula leucocitaria (%)", "Absolute counts": "Recuentos absolutos", "Seg / neutrophils (%)": "Seg / neutrófilos (%)", "Band (%) — optional": "Bandas (%) — opcional", "Lymphocytes (%)": "Linfocitos (%)", "Absolute neutrophil count (ANC)": "Recuento absoluto de neutrófilos (ANC)", "Absolute lymphocyte count (ALC)": "Recuento absoluto de linfocitos (ALC)", "Calculate NLR": "Calcular NLR", "Calculated NLR": "NLR calculado", "Fukuda NLR item": "Ítem NLR de Fukuda", "Use this NLR in Fukuda score": "Usar este NLR en la puntuación de Fukuda", "Size of lung metastasis?": "¿Tamaño de la metástasis pulmonar?", "No lung metastasis": "Sin metástasis pulmonar", "Baseline tumor size?": "¿Tamaño tumoral basal?", "Tumor-volume doubling time (TV-DT)?": "¿Tiempo de duplicación del volumen tumoral (TV-DT)?", "Calculate TV-DT from two imaging studies": "Calcular TV-DT con dos estudios de imagen", "Diameter": "Diámetro", "Volume": "Volumen", "Date of 1st study": "Fecha del 1.er estudio", "Date of 2nd study": "Fecha del 2.º estudio", "Calculate TV-DT": "Calcular TV-DT", "Study interval": "Intervalo entre estudios", "TV-DT (years)": "TV-DT (años)", "Fukuda TV-DT item": "Ítem TV-DT de Fukuda", "Use this TV-DT in Fukuda score": "Usar este TV-DT en la puntuación de Fukuda", "Calculate Score": "Calcular puntuación", "Fukuda Clinical Indication Score Report": "Informe de puntuación clínica de Fukuda", "Low risk": "Riesgo bajo", "Intermediate risk": "Riesgo intermedio", "High risk": "Riesgo alto", "Continue active surveillance": "Continuar vigilancia activa", "Consider targeted therapy": "Considerar terapia dirigida", "Promptly assess for targeted therapy": "Evaluar pronto terapia dirigida", "Score Breakdown": "Desglose de puntuación", "Save to Registry": "Guardar en el registro", "Saved to local registry.": "Guardado en el registro local", "Start Over": "Reiniciar", "Copy Result": "Copiar resultado", "Export PDF Report": "Exportar informe PDF", "Interpretation": "Interpretación", "Reference:": "Referencia:", "Fukuda Registry": "Registro Fukuda", "New Assessment": "Nueva evaluación", "Delete All Local Records": "Eliminar todos los registros locales", "Live Score": "Puntuación en tiempo real", "Incomplete": "Incompleto", "Intermediate": "Intermedio", "Age": "Edad", "Tumor-related symptoms": "Síntomas tumorales", "Histology": "Histología", "Metastatic sites": "Sitios metastásicos", "Lung metastasis size": "Tamaño de metástasis pulmonar", "Baseline tumor size": "Tamaño tumoral basal", "manual": "manual", "calculated from CBC": "calculado desde CBC", "2-study estimate": "estimación con 2 estudios", "Delete": "Eliminar", "Close": "Cerrar"},
+    'fr': {"Clinical Calculator": "Calculateur clinique", "Language": "Langue", "Fukuda Clinical Indication Score": "Score d’indication clinique de Fukuda", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · Moment de la thérapie ciblée et registre des cas", "Clinical Indication Score": "Score d’indication clinique", "When to consider": "Quand envisager", "targeted therapy": "une thérapie ciblée", "Patient Record": "Dossier patient", "Medical Record Number (MRN) *": "Numéro de dossier médical (MRN) *", "Pretreatment Date *": "Date prétraitement *", "View Registry": "Voir le registre", "Export Excel (.xlsx)": "Exporter Excel (.xlsx)", "Export Google Sheets (CSV)": "Exporter pour Google Sheets (CSV)", "Copy for Google Sheets": "Copier pour Google Sheets", "How old is the patient?": "Quel âge a le patient ?", "years": "ans", "Fukuda threshold:": "Seuil de Fukuda :", "Next →": "Suivant →", "← Back": "← Retour", "Tumor-related symptoms?": "Symptômes liés à la tumeur ?", "Asymptomatic": "Asymptomatique", "No tumor-related symptoms": "Aucun symptôme lié à la tumeur", "Symptomatic": "Symptomatique", "Tumor-related symptoms present": "Symptômes liés à la tumeur présents", "Histological subtype?": "Sous-type histologique ?", "Papillary thyroid cancer (PTC)": "Cancer papillaire de la thyroïde (PTC)", "Follicular thyroid cancer (FTC)": "Cancer folliculaire de la thyroïde (FTC)", "Poorly differentiated thyroid cancer (PDTC)": "Cancer thyroïdien peu différencié (PDTC)", "Metastatic sites?": "Sites métastatiques ?", "Pulmonary only": "Pulmonaire uniquement", "Extrapulmonary disease": "Maladie extrapulmonaire", "Neutrophil-to-lymphocyte ratio (NLR)": "Rapport neutrophiles/lymphocytes (NLR)", "Calculate NLR from pretreatment CBC": "Calculer le NLR à partir de la NFS prétraitement", "CBC date": "Date de la NFS", "CBC differential (%)": "Formule leucocytaire (%)", "Absolute counts": "Numérations absolues", "Seg / neutrophils (%)": "Seg / neutrophiles (%)", "Band (%) — optional": "Bandes (%) — facultatif", "Lymphocytes (%)": "Lymphocytes (%)", "Absolute neutrophil count (ANC)": "Nombre absolu de neutrophiles (ANC)", "Absolute lymphocyte count (ALC)": "Nombre absolu de lymphocytes (ALC)", "Calculate NLR": "Calculer le NLR", "Calculated NLR": "NLR calculé", "Fukuda NLR item": "Item NLR de Fukuda", "Use this NLR in Fukuda score": "Utiliser ce NLR dans le score de Fukuda", "Size of lung metastasis?": "Taille de la métastase pulmonaire ?", "No lung metastasis": "Pas de métastase pulmonaire", "Baseline tumor size?": "Taille tumorale initiale ?", "Tumor-volume doubling time (TV-DT)?": "Temps de doublement du volume tumoral (TV-DT) ?", "Calculate TV-DT from two imaging studies": "Calculer le TV-DT à partir de deux examens d’imagerie", "Diameter": "Diamètre", "Volume": "Volume", "Date of 1st study": "Date du 1er examen", "Date of 2nd study": "Date du 2e examen", "Calculate TV-DT": "Calculer le TV-DT", "Study interval": "Intervalle entre les examens", "TV-DT (years)": "TV-DT (années)", "Fukuda TV-DT item": "Item TV-DT de Fukuda", "Use this TV-DT in Fukuda score": "Utiliser ce TV-DT dans le score de Fukuda", "Calculate Score": "Calculer le score", "Fukuda Clinical Indication Score Report": "Rapport du score clinique de Fukuda", "Low risk": "Risque faible", "Intermediate risk": "Risque intermédiaire", "High risk": "Risque élevé", "Continue active surveillance": "Poursuivre la surveillance active", "Consider targeted therapy": "Envisager une thérapie ciblée", "Promptly assess for targeted therapy": "Évaluer rapidement une thérapie ciblée", "Score Breakdown": "Détail du score", "Save to Registry": "Enregistrer dans le registre", "Saved to local registry.": "Enregistré dans le registre local", "Start Over": "Recommencer", "Copy Result": "Copier le résultat", "Export PDF Report": "Exporter le rapport PDF", "Interpretation": "Interprétation", "Reference:": "Référence :", "Fukuda Registry": "Registre Fukuda", "New Assessment": "Nouvelle évaluation", "Delete All Local Records": "Supprimer tous les enregistrements locaux", "Live Score": "Score en temps réel", "Incomplete": "Incomplet", "Intermediate": "Intermédiaire", "Age": "Âge", "Tumor-related symptoms": "Symptômes liés à la tumeur", "Histology": "Histologie", "Metastatic sites": "Sites métastatiques", "Lung metastasis size": "Taille de la métastase pulmonaire", "Baseline tumor size": "Taille tumorale initiale", "manual": "manuel", "calculated from CBC": "calculé à partir de la NFS", "2-study estimate": "estimation sur 2 examens", "Delete": "Supprimer", "Close": "Fermer"},
+    'de': {"Clinical Calculator": "Klinischer Rechner", "Language": "Sprache", "Fukuda Clinical Indication Score": "Fukuda Clinical Indication Score", "RR-DTC · Targeted therapy timing & case registry": "RR-DTC · Zeitpunkt der zielgerichteten Therapie und Fallregister", "Clinical Indication Score": "Klinischer Indikationsscore", "When to consider": "Wann sollte", "targeted therapy": "eine zielgerichtete Therapie erwogen werden", "Patient Record": "Patientendaten", "Medical Record Number (MRN) *": "Krankenaktennummer (MRN) *", "Pretreatment Date *": "Datum vor Therapiebeginn *", "View Registry": "Register anzeigen", "Export Excel (.xlsx)": "Excel exportieren (.xlsx)", "Export Google Sheets (CSV)": "Für Google Sheets exportieren (CSV)", "Copy for Google Sheets": "Für Google Sheets kopieren", "How old is the patient?": "Wie alt ist der Patient?", "years": "Jahre", "Fukuda threshold:": "Fukuda-Grenzwert:", "Next →": "Weiter →", "← Back": "← Zurück", "Tumor-related symptoms?": "Tumorbedingte Symptome?", "Asymptomatic": "Asymptomatisch", "No tumor-related symptoms": "Keine tumorbedingten Symptome", "Symptomatic": "Symptomatisch", "Tumor-related symptoms present": "Tumorbedingte Symptome vorhanden", "Histological subtype?": "Histologischer Subtyp?", "Papillary thyroid cancer (PTC)": "Papilläres Schilddrüsenkarzinom (PTC)", "Follicular thyroid cancer (FTC)": "Follikuläres Schilddrüsenkarzinom (FTC)", "Poorly differentiated thyroid cancer (PDTC)": "Gering differenziertes Schilddrüsenkarzinom (PDTC)", "Metastatic sites?": "Metastasenlokalisation?", "Pulmonary only": "Nur pulmonal", "Extrapulmonary disease": "Extrapulmonale Erkrankung", "Neutrophil-to-lymphocyte ratio (NLR)": "Neutrophilen-Lymphozyten-Verhältnis (NLR)", "Calculate NLR from pretreatment CBC": "NLR aus prätherapeutischem Blutbild berechnen", "CBC date": "Datum des Blutbilds", "CBC differential (%)": "Differenzialblutbild (%)", "Absolute counts": "Absolute Zellzahlen", "Seg / neutrophils (%)": "Seg / Neutrophile (%)", "Band (%) — optional": "Stabkernige (%) — optional", "Lymphocytes (%)": "Lymphozyten (%)", "Absolute neutrophil count (ANC)": "Absolute Neutrophilenzahl (ANC)", "Absolute lymphocyte count (ALC)": "Absolute Lymphozytenzahl (ALC)", "Calculate NLR": "NLR berechnen", "Calculated NLR": "Berechneter NLR", "Fukuda NLR item": "Fukuda-NLR-Punkt", "Use this NLR in Fukuda score": "Diesen NLR im Fukuda-Score verwenden", "Size of lung metastasis?": "Größe der Lungenmetastase?", "No lung metastasis": "Keine Lungenmetastase", "Baseline tumor size?": "Ausgangstumorgröße?", "Tumor-volume doubling time (TV-DT)?": "Tumorvolumen-Verdopplungszeit (TV-DT)?", "Calculate TV-DT from two imaging studies": "TV-DT aus zwei Bildgebungen berechnen", "Diameter": "Durchmesser", "Volume": "Volumen", "Date of 1st study": "Datum der 1. Untersuchung", "Date of 2nd study": "Datum der 2. Untersuchung", "Calculate TV-DT": "TV-DT berechnen", "Study interval": "Untersuchungsintervall", "TV-DT (years)": "TV-DT (Jahre)", "Fukuda TV-DT item": "Fukuda-TV-DT-Punkt", "Use this TV-DT in Fukuda score": "Diesen TV-DT im Fukuda-Score verwenden", "Calculate Score": "Score berechnen", "Fukuda Clinical Indication Score Report": "Fukuda Clinical Indication Score Bericht", "Low risk": "Niedriges Risiko", "Intermediate risk": "Mittleres Risiko", "High risk": "Hohes Risiko", "Continue active surveillance": "Aktive Überwachung fortsetzen", "Consider targeted therapy": "Zielgerichtete Therapie erwägen", "Promptly assess for targeted therapy": "Zielgerichtete Therapie zeitnah prüfen", "Score Breakdown": "Score-Aufschlüsselung", "Save to Registry": "Im Register speichern", "Saved to local registry.": "Im lokalen Register gespeichert", "Start Over": "Neu beginnen", "Copy Result": "Ergebnis kopieren", "Export PDF Report": "PDF-Bericht exportieren", "Interpretation": "Interpretation", "Reference:": "Referenz:", "Fukuda Registry": "Fukuda-Register", "New Assessment": "Neue Bewertung", "Delete All Local Records": "Alle lokalen Datensätze löschen", "Live Score": "Live-Score", "Incomplete": "Unvollständig", "Intermediate": "Mittel", "Age": "Alter", "Tumor-related symptoms": "Tumorbedingte Symptome", "Histology": "Histologie", "Metastatic sites": "Metastasenlokalisation", "Lung metastasis size": "Größe der Lungenmetastase", "Baseline tumor size": "Ausgangstumorgröße", "manual": "manuell", "calculated from CBC": "aus Blutbild berechnet", "2-study estimate": "Schätzung aus 2 Untersuchungen", "Delete": "Löschen", "Close": "Schließen"}
+  };
+  Object.assign(I18N["zh-Hant"], {"Purpose:": "用途：", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "本工具為 RR-DTC 臨床決策輔助工具，整合 Fukuda 評分的 8 項變數，以協助評估何時考慮開始標靶治療；不取代多專科團隊的臨床判斷。", "About this score": "關於此評分", "How to use:": "使用方式：", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "請輸入治療時機評估當下的治療前資料。NLR 與 TV-DT 可直接輸入，或使用內建計算工具。最終分數用於輔助，而非單獨決定治療。", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "可識別病人資料請使用院方核准的系統；臨床或研究使用前請確認原始資料。"});
+  Object.assign(I18N["ja"], {"Purpose:": "目的：", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "RR-DTCにおいて、Fukudaスコアの8項目をまとめ、分子標的治療をいつ検討するかの判断を支援する臨床意思決定支援ツールです。多職種による臨床判断に代わるものではありません。", "About this score": "このスコアについて", "How to use:": "使用方法：", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "治療開始時期を評価する時点の治療前データを入力してください。NLRとTV-DTは直接入力するか、内蔵ツールで計算できます。最終スコアは治療判断を支援するもので、単独で決定するものではありません。", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "個人を特定できる患者データには施設承認済みのシステムを使用し、臨床・研究利用前に原データを確認してください。"});
+  Object.assign(I18N["ko"], {"Purpose:": "목적:", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "RR-DTC에서 Fukuda 점수의 8개 변수를 요약하여 표적치료를 언제 고려할지 평가하는 임상 의사결정 지원 도구입니다. 다학제 임상 판단을 대체하지 않습니다.", "About this score": "이 점수에 대하여", "How to use:": "사용 방법:", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "치료 시작 시점 평가 시의 치료 전 데이터를 입력하십시오. NLR과 TV-DT는 직접 입력하거나 내장 계산기로 계산할 수 있습니다. 최종 점수는 치료 결정을 지원하기 위한 것이며 단독으로 결정하지 않습니다.", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "식별 가능한 환자 데이터는 기관 승인 시스템을 사용하고, 임상 또는 연구 사용 전에 원자료를 확인하십시오."});
+  Object.assign(I18N["es"], {"Purpose:": "Objetivo:", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "Herramienta de apoyo a la decisión clínica para RR-DTC que resume las ocho variables del puntaje de Fukuda para ayudar a valorar cuándo considerar terapia dirigida. No sustituye el juicio clínico multidisciplinario.", "About this score": "Acerca de esta puntuación", "How to use:": "Cómo utilizarla:", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "Introduzca los datos pretratamiento correspondientes al momento de evaluar el inicio terapéutico. El NLR y el TV-DT pueden introducirse directamente o calcularse con las herramientas integradas. La puntuación final apoya, pero no determina, la decisión terapéutica.", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "Utilice sistemas aprobados por la institución para datos identificables de pacientes y verifique los datos fuente antes del uso clínico o de investigación."});
+  Object.assign(I18N["fr"], {"Purpose:": "Objectif :", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "Outil d’aide à la décision clinique pour le RR-DTC résumant les huit variables du score de Fukuda afin d’aider à évaluer quand envisager une thérapie ciblée. Il ne remplace pas le jugement clinique multidisciplinaire.", "About this score": "À propos de ce score", "How to use:": "Mode d’emploi :", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "Saisissez les données préthérapeutiques au moment de l’évaluation du début du traitement. Le NLR et le TV-DT peuvent être saisis directement ou calculés avec les outils intégrés. Le score final aide la décision sans la déterminer à lui seul.", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "Utilisez des systèmes approuvés par l’établissement pour les données identifiables et vérifiez les données sources avant toute utilisation clinique ou de recherche."});
+  Object.assign(I18N["de"], {"Purpose:": "Zweck:", "A clinical decision-support tool for RR-DTC that summarizes eight Fukuda score variables to support assessment of when to consider targeted therapy. It does not replace multidisciplinary clinical judgment.": "Ein klinisches Entscheidungsunterstützungstool für RR-DTC, das die acht Variablen des Fukuda-Scores zusammenfasst und die Beurteilung unterstützt, wann eine zielgerichtete Therapie erwogen werden sollte. Es ersetzt keine multidisziplinäre klinische Beurteilung.", "About this score": "Über diesen Score", "How to use:": "Anwendung:", "Enter pretreatment data at the treatment-timing assessment. NLR and TV-DT may be entered directly or calculated with the built-in tools. The final score is intended to support—not determine—treatment decisions.": "Geben Sie die prätherapeutischen Daten zum Zeitpunkt der Therapieentscheidung ein. NLR und TV-DT können direkt eingegeben oder mit den integrierten Rechnern berechnet werden. Der endgültige Score unterstützt die Therapieentscheidung, bestimmt sie jedoch nicht allein.", "Use institution-approved systems for identifiable patient data. Verify source data before clinical or research use.": "Verwenden Sie für identifizierbare Patientendaten nur institutionell freigegebene Systeme und prüfen Sie die Quelldaten vor klinischer oder wissenschaftlicher Nutzung."});
+  const PH = {
+    'zh-Hant': {"Enter medical record number": "病歷號碼", "e.g. 68": "例如：68", "e.g. 3.14": "例如：3.14", "e.g. 72.4": "例如：72.4", "e.g. 0": "例如：0", "e.g. 18.5": "例如：18.5", "e.g. 5.41": "例如：5.41", "e.g. 1.38": "例如：1.38", "e.g. 12.0": "例如：12.0", "e.g. 41.1": "例如：41.1", "e.g. 0.53": "例如：0.53", "e.g. 1.20": "例如：1.20", "e.g. 1.80": "例如：1.80", "e.g. 1.5": "例如：1.5", "e.g. 3.2": "例如：3.2"},
+    'ja': {"Enter medical record number": "診療録番号を入力", "e.g. 68": "例：68", "e.g. 3.14": "例：3.14", "e.g. 72.4": "例：72.4", "e.g. 0": "例：0", "e.g. 18.5": "例：18.5", "e.g. 5.41": "例：5.41", "e.g. 1.38": "例：1.38", "e.g. 12.0": "例：12.0", "e.g. 41.1": "例：41.1", "e.g. 0.53": "例：0.53", "e.g. 1.20": "例：1.20", "e.g. 1.80": "例：1.80", "e.g. 1.5": "例：1.5", "e.g. 3.2": "例：3.2"},
+    'ko': {"Enter medical record number": "의무기록번호 입력", "e.g. 68": "예: 68", "e.g. 3.14": "예: 3.14"},
+    'es': {"Enter medical record number": "Introducir MRN", "e.g. 68": "p. ej., 68", "e.g. 3.14": "p. ej., 3.14"},
+    'fr': {"Enter medical record number": "Saisir le MRN", "e.g. 68": "ex. 68", "e.g. 3.14": "ex. 3,14"},
+    'de': {"Enter medical record number": "MRN eingeben", "e.g. 68": "z. B. 68", "e.g. 3.14": "z. B. 3,14"}
+  };
+  const textOriginal = new WeakMap();
+  const placeholderOriginal = new WeakMap();
+  const titleOriginal = new WeakMap();
+  let currentLang = localStorage.getItem('fukuda_ui_language') || 'en';
+
+  function dict(){ return I18N[currentLang] || {}; }
+
+  function dynamicTranslate(s){
+    if(currentLang==='en') return s;
+    const d=dict();
+    if(d[s]!==undefined) return d[s];
+
+    const L = currentLang;
+    const n = (en, zh, ja, ko, es, fr, de) => ({
+      'zh-Hant':zh,'ja':ja,'ko':ko,'es':es,'fr':fr,'de':de
+    }[L] || en);
+
+    let m;
+    if((m=s.match(/^Question (\d+) \/ 8$/))) {
+      return n(s, `第 ${m[1]} 題／共 8 題`, `質問 ${m[1]} / 8`,
+        `질문 ${m[1]} / 8`, `PREGUNTA ${m[1]} / 8`,
+        `QUESTION ${m[1]} / 8`, `FRAGE ${m[1]} / 8`);
+    }
+    if((m=s.match(/^(\d+) answered$/))) {
+      return n(s, `已完成 ${m[1]} 題`, `${m[1]}項目入力済み`,
+        `${m[1]}개 항목 완료`, `${m[1]} respondidas`,
+        `${m[1]} réponses`, `${m[1]} beantwortet`);
+    }
+    if((m=s.match(/^(\d+) saved records?$/))) {
+      return n(s, `已儲存 ${m[1]} 筆`, `${m[1]}件保存済み`,
+        `${m[1]}건 저장됨`, `${m[1]} registros guardados`,
+        `${m[1]} dossiers enregistrés`, `${m[1]} Datensätze gespeichert`);
+    }
+    if((m=s.match(/^(\d+) records?$/))) {
+      return n(s, `共 ${m[1]} 筆`, `${m[1]}件`,
+        `${m[1]}건`, `${m[1]} registros`,
+        `${m[1]} dossiers`, `${m[1]} Datensätze`);
+    }
+    if((m=s.match(/^(\d+)\/8 completed$/))) {
+      return n(s, `已完成 ${m[1]}/8`, `${m[1]}/8 完了`,
+        `${m[1]}/8 완료`, `${m[1]}/8 completados`,
+        `${m[1]}/8 complétés`, `${m[1]}/8 abgeschlossen`);
+    }
+    if((m=s.match(/^([+]?\d+) points?$/))) {
+      return n(s, `${m[1]} 分`, `${m[1]}点`, `${m[1]}점`,
+        `${m[1]} puntos`, `${m[1]} points`, `${m[1]} Punkte`);
+    }
+    if((m=s.match(/^([\d,.]+) days$/))) {
+      return n(s, `${m[1]} 天`, `${m[1]}日`, `${m[1]}일`,
+        `${m[1]} días`, `${m[1]} jours`, `${m[1]} Tage`);
+    }
+    if((m=s.match(/^([\d,.]+) years$/))) {
+      return n(s, `${m[1]} 年`, `${m[1]}年`, `${m[1]}년`,
+        `${m[1]} años`, `${m[1]} ans`, `${m[1]} Jahre`);
+    }
+    if((m=s.match(/^([\d,.]+) years \(2-study estimate\)$/))) {
+      return n(s, `${m[1]} 年（兩次影像估算）`, `${m[1]}年（2回画像推定）`,
+        `${m[1]}년 (2회 영상 추정)`, `${m[1]} años (estimación con 2 estudios)`,
+        `${m[1]} ans (estimation sur 2 examens)`, `${m[1]} Jahre (Schätzung aus 2 Untersuchungen)`);
+    }
+    if((m=s.match(/^([\d,.]+) \(calculated from CBC\)$/))) {
+      return n(s, `${m[1]}（由 CBC 計算）`, `${m[1]}（CBCから計算）`,
+        `${m[1]} (CBC로 계산)`, `${m[1]} (calculado desde CBC)`,
+        `${m[1]} (calculé à partir de la NFS)`, `${m[1]} (aus Blutbild berechnet)`);
+    }
+    if(s==='0 pt') return n(s,'0 分','0点','0점','0 puntos','0 point','0 Punkte');
+    if(s==='+1 pt') return n(s,'+1 分','+1点','+1점','+1 punto','+1 point','+1 Punkt');
+
+    return s;
+  }
+
+  function translateTextNode(node){
+    if(!node || node.nodeType!==Node.TEXT_NODE) return;
+    if(!textOriginal.has(node)) textOriginal.set(node,node.nodeValue);
+    const original=textOriginal.get(node);
+    const trimmed=original.trim();
+    if(!trimmed) return;
+    const leading=original.match(/^\s*/)[0], trailing=original.match(/\s*$/)[0];
+    node.nodeValue=leading + dynamicTranslate(trimmed) + trailing;
+  }
+
+  function walk(root){
+    if(!root) return;
+    if(root.nodeType===Node.TEXT_NODE){ translateTextNode(root); return; }
+    if(root.nodeType!==Node.ELEMENT_NODE && root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE) return;
+
+    if(root.nodeType===Node.ELEMENT_NODE){
+      const el=root;
+      if(el.tagName==='SCRIPT' || el.tagName==='STYLE' || el.id==='languageSelect') return;
+
+      if(el.hasAttribute('placeholder')){
+        if(!placeholderOriginal.has(el)) placeholderOriginal.set(el,el.getAttribute('placeholder'));
+        const o=placeholderOriginal.get(el);
+        el.setAttribute('placeholder', currentLang==='en' ? o : ((PH[currentLang]||{})[o] || o));
+      }
+      if(el.hasAttribute('title')){
+        if(!titleOriginal.has(el)) titleOriginal.set(el,el.getAttribute('title'));
+        const o=titleOriginal.get(el);
+        el.setAttribute('title', currentLang==='en' ? o : (dict()[o] || o));
+      }
+    }
+    [...root.childNodes].forEach(walk);
+  }
+
+  function applyLanguage(lang){
+    currentLang=lang || 'en';
+    localStorage.setItem('fukuda_ui_language',currentLang);
+    document.documentElement.lang=currentLang;
+    const select=document.getElementById('languageSelect');
+    if(select && select.value!==currentLang) select.value=currentLang;
+    walk(document.body);
+
+    // Force dynamic components to refresh in their native code, then translate again.
+    setTimeout(()=>walk(document.body),0);
+  }
+
+  const observer=new MutationObserver(muts=>{
+    for(const m of muts){
+      if(m.type==='characterData') translateTextNode(m.target);
+      else for(const n of m.addedNodes) walk(n);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    const select=document.getElementById('languageSelect');
+    if(select){
+      select.value=currentLang;
+      select.addEventListener('change',()=>applyLanguage(select.value));
+    }
+    applyLanguage(currentLang);
+    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+
+    // Translate browser alerts generated by the existing calculator.
+    const nativeAlert=window.alert.bind(window);
+    window.alert=(msg)=>nativeAlert(dynamicTranslate(String(msg)));
+  });
+
+  window.fukudaSetLanguage=applyLanguage;
+})();
+</script>
+
+
+<script>
+(function(){
+  function bindLanguageDock(){
+    const s=document.getElementById('languageSelect');
+    if(!s || s.dataset.boundFallback==='1') return;
+    s.dataset.boundFallback='1';
+    s.style.pointerEvents='auto';
+    s.addEventListener('change',function(e){
+      e.stopPropagation();
+      if(window.fukudaSetLanguage) window.fukudaSetLanguage(this.value);
+    });
+    s.addEventListener('click',function(e){e.stopPropagation();});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindLanguageDock);
+  else bindLanguageDock();
+  setTimeout(bindLanguageDock,100);
+})();
+</script>
+
 </body>
 </html>
