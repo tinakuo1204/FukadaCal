@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MMM + TNMC 雙系統評估器</title>
+<link rel="stylesheet" href="/style.css">
+<script defer src="/i18n.js"></script>
+<script defer src="/app.js"></script>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><div class="logo">M²</div><div><h1 data-i18n="title">MMM + TNMC 雙系統評估器</h1><p data-i18n="subtitle">Thyroid Cancer · Neoadjuvant Therapy · Surgical Morbidity &amp; Resectability</p></div></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="pill">Research / MDT Decision Support</div>
+      <div class="langbox">
+        <span>Language</span>
+        <select id="langSelect" aria-label="Language">
+          <option value="en">English</option>
+          <option value="zh-Hant" selected>繁體中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro">
+    <div class="intro-text"><b data-i18n="usage_title">使用說明與計分狀態：</b><span data-i18n="usage">本工具完整實作公開文獻所載的 TNMC / Invasive Thyroid Class（0–4）。MMM 僅自動加總可由公開本文明確核實的 6 類權重；其他構面採研究者自填原始權重，未填者不計分，並不顯示為正式完整 MMM 總分。</span></div>
+    <details class="about"><summary data-i18n="limits">使用與限制</summary><div class="about-panel"><b>資料：</b>僅在目前瀏覽器頁面處理，無伺服器、無自動傳送、無自動儲存；重新整理即清除。<br><br><b>臨床：</b>本工具協助比較治療前後解剖侵犯、預期手術複雜度與可切除性，不可單獨決定手術或全身治療。未勾選代表「無此項或尚未選取」，臨床使用前請確認各項均已評估。<br><br><b>MMM：</b>研究者自填欄位須依正式 Supplementary Table S1 或研究方案核對。</div></details>
+  </div>
+
+  <div class="toolbar">
+    <div class="field"><div class="label" data-i18n="case">匿名病例代碼 / Anonymous case code</div><input id="caseCode" type="text" placeholder="e.g. NA-TC-001"></div>
+    <div class="field"><div class="label" data-i18n="therapy">治療種類 / Neoadjuvant therapy</div><select id="therapy"><option value="">— Select —</option><option>Lenvatinib</option><option>BRAF/MEK inhibitor</option><option>RET inhibitor</option><option>NTRK inhibitor</option><option>Other TKI</option><option>Combination / Other</option></select></div>
+    <div class="field"><div class="label" data-i18n="date">評估日期 / Assessment date</div><input id="assessmentDate" type="date"></div>
+  </div>
+
+  <div class="workspace">
+    <div class="col">
+      <section class="card">
+        <div class="head"><div><div class="title" data-i18n="tnmc">一、TNMC / Invasive Thyroid Class — 全項目自動分級</div><div class="sub" data-i18n="tnmcsub">採用最高嚴重度作為 Class。Segmental tracheal resection 恰為 4.0 cm 時要求專家判斷，不自動歸類。</div><div style="margin-top:5px;font-size:8.5px;color:#71808b"><span class="linked-tag">↔ TNMC / MMM</span> <span data-i18n="linked_help">Shared anatomical items are synchronized bidirectionally.</span></div></div><div class="pill">0 Mild → 4 Unresectable</div></div>
+        <div class="body compare"><div class="phase" id="tnmcBefore"></div><div class="phase" id="tnmcAfter"></div></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <div class="head"><div><div class="title" data-i18n="mmm">二、MMM Surgical Morbidity / Complexity — 已核實權重</div><div class="sub" data-i18n="mmmsub">依 Hartl 2025 公開本文可明確核實的 6 類。Carotid / innominate encasement 合併為同一 major artery 類別，避免重複計分。</div></div><div class="pill" data-i18n="verified">Verified subtotal only</div></div>
+        <div class="body"><div class="mmm-list" id="mmmList"></div><div class="sumgrid"><div class="sum"><span>Baseline verified subtotal</span><strong id="mmmBefore">0</strong></div><div class="sum"><span>After verified subtotal</span><strong id="mmmAfter">0</strong></div></div></div>
+      </section>
+
+      <section class="card">
+        <div class="head"><div><div class="title" data-i18n="custom">三、其他 MMM 構面：研究者自填原始配分</div><div class="sub" data-i18n="customsub">請依正式 Supplementary Table S1 或研究方案核對後輸入；未輸入權重者不納入計算。</div></div></div>
+        <div class="body"><div class="note" data-i18n="researchwarn">⚠ 此區為 research-entry layer。即使每列都有權重，若未核對完整官方 S1 清單，仍不得標示為「正式完整 MMM 總分」。</div><table class="ct"><thead><tr><th>項目 / Structure</th><th style="width:68px">權重</th><th style="width:44px">治療前</th><th style="width:44px">治療後</th><th style="width:28px"></th></tr></thead><tbody id="customBody"></tbody></table><button id="addRow" class="add" type="button">＋ 新增其他構面 / Add structure</button><div class="sumgrid"><div class="sum"><span>Research subtotal · Before</span><strong id="customBefore">0</strong></div><div class="sum"><span>Research subtotal · After</span><strong id="customAfter">0</strong></div></div></div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <section class="card results"><h2 data-i18n="results">四、治療前後比較 Results</h2><div class="rgrid">
+        <div class="metric blue"><span>TNMC Before</span><strong id="rTB">0</strong></div><div class="metric blue"><span>TNMC After</span><strong id="rTA">0</strong></div>
+        <div class="metric full"><span data-i18n="change">TNMC Change</span><strong id="rTC">0</strong><div id="tnmcChip" class="chip">No change</div></div>
+        <div class="metric teal full"><span data-i18n="mmmchange">MMM 已核實小計變化</span><strong id="rMMM">0 → 0</strong><small style="font-size:8px;color:#6f7b85" data-i18n="verifiedonly">僅已核實項目</small></div>
+        <div class="metric full"><span data-i18n="customsum">Research-entered custom subtotal</span><strong id="rCustom">0 → 0</strong><div id="missingW" class="chip">0 missing weights</div></div>
+      </div>
+        <div class="response-card" id="responseSummary">
+          <div class="response-head">
+            <div><div class="response-title" data-i18n="response_title">Visual Response Summary</div>
+            <div class="response-sub" data-i18n="response_sub">Descriptive before → after comparison; not a validated response criterion.</div></div>
+            <div class="response-badge" id="responseBadge">No change</div>
+          </div>
+          <div class="response-row">
+            <div class="response-row-head"><span>TNMC Class</span><strong id="tnmcVisualLabel">0 → 0</strong></div>
+            <div class="response-track"><div class="response-before" id="tnmcBeforeBar"></div><div class="response-after" id="tnmcAfterBar"></div></div>
+            <div class="response-scale"><span>0</span><span>4</span></div>
+          </div>
+          <div class="response-row">
+            <div class="response-row-head"><span data-i18n="mmm_verified_label">MMM verified subtotal</span><strong id="mmmVisualLabel">0 → 0</strong></div>
+            <div class="response-track"><div class="response-before" id="mmmBeforeBar"></div><div class="response-after" id="mmmAfterBar"></div></div>
+            <div class="response-scale"><span>0</span><span>31</span></div>
+          </div>
+          <div class="response-delta">
+            <div class="response-mini"><span data-i18n="tnmc_delta_label">TNMC Δ</span><strong id="tnmcDeltaVisual">0</strong></div>
+            <div class="response-mini"><span data-i18n="mmm_reduction_label">MMM verified reduction</span><strong id="mmmReductionVisual">—</strong></div>
+          </div>
+          <div class="response-foot" data-i18n="response_foot">Direction is descriptive only. A lower TNMC class and/or lower verified MMM subtotal suggests reduced anatomical/surgical complexity, but does not independently define resectability or treatment response.</div>
+        </div>
+        <div class="limit" data-i18n="limit">MMM 固定分開顯示「已核實小計」與「研究者自填小計」，不合併宣稱為正式完整 MMM 總分。</div></section>
+
+      <section class="card notes"><div class="body"><div class="label" data-i18n="notes">Clinical notes / MDT 討論紀錄</div><textarea id="notes" placeholder="影像判讀、侵犯界面、治療反應、手術可行性與 MDT 決策重點…"></textarea></div></section>
+
+      <section class="card"><div class="body actions"><button id="csvBtn" class="btn primary" data-i18n="csv">匯出 CSV</button><button id="jsonBtn" class="btn primary" data-i18n="json">匯出 JSON</button><button id="printBtn" class="btn secondary" data-i18n="print">列印／另存 PDF</button><button id="clearBtn" class="btn danger" data-i18n="clear">清除資料</button></div></section>
+
+      <section class="card"><div class="body refs"><b data-i18n="refs">參考來源與限制</b><ul><li><a href="https://doi.org/10.1002/hed.27735" target="_blank">Russell et al., Head &amp; Neck (2024)</a> — MMM / Invasive Thyroid Class；Supplementary Tables S1–S2。</li><li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12151826/" target="_blank">Hartl et al., Frontiers in Oncology (2025)</a> — TNMC Table 1 與部分 MMM 明確權重。</li><li><a href="https://clinicaltrials.gov/study/NCT04321954" target="_blank">NCT04321954</a> — neoadjuvant lenvatinib protocol。</li></ul><div><b>4 cm boundary：</b>原表僅列 &lt;4 cm 與 &gt;4 cm；exactly 4 cm 本工具不自動歸類。</div><div style="margin-top:4px"><b>Class 4：</b>分類名稱為 “Unresectable”，不等於所有臨床情境下絕對不可切除。</div></div></section>
+    </aside>
+  </div>
+  <div class="footer" data-i18n="footer">No server · No automatic storage · Export only on user action · Clinical / research decision support</div>
+</div>
+</body>
+</html>
